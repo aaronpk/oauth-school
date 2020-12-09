@@ -1,6 +1,10 @@
-{# templates/base.html.twig #}
+{# templates/index.html.twig #} {% extends 'base.html.twig' %} 
 
+{% block title %}Welcome to OAuth School{% endblock %}
 
-Hello World
+{% block body %}
 
-{{ date }}
+<p>Hello World</p>
+<p>{{ date }}</p>
+
+{% endblock %}
