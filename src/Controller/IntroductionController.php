@@ -2,9 +2,9 @@
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use GuzzleHttp;
 
 class IntroductionController extends AbstractController {
@@ -26,7 +26,7 @@ class IntroductionController extends AbstractController {
       'issuer' => $issuer,
       'scopes' => $scopes,
       'scopeString' => implode(' ', $scopes ?: []),
-      'numScopes' => count($scopes),
+      'numScopes' => count($scopes ?: []),
     ]);
   }
 

@@ -30,7 +30,7 @@
           <form method="post" action="{{ path('introduction/save') }}">
             <div class="mb-3">
               <label for="issuer" class="form-label">Issuer URL</label>
-              <input type="url" class="form-control" id="issuer" name="issuer" aria-describedby="issuerHelp" placeholder="https://dev-XXXXXX.okta.com/oauth2/default" value="{{ issuer }}">
+              <input type="url" class="form-control" id="issuer" name="issuer" aria-describedby="issuerHelp" placeholder="https://dev-XXXXXX.okta.com/oauth2/default" value="{{ issuer }}" {{ issuer ? "disabled" : "" }}>
               <div id="issuerHelp" class="form-text">We'll save the issuer URL to use it when checking your work in the following exercises</div>
             </div>
             {% if scopes %}
@@ -39,8 +39,9 @@
                 <input type="text" class="form-control" id="scopes" name="scopes" aria-describedby="scopesHelp" value="{{ scopeString }}" disabled>
                 <div id="issuerHelp" class="form-text">We found the following custom scopes in your OAuth server metadata</div>
               </div>
+            {% else %}
+              <button type="submit" class="btn btn-primary">Save</button>
             {% endif %}
-            <button type="submit" class="btn btn-primary">Save</button>
           </form>
 
         </div>
