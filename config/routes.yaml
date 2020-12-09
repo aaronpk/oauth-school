@@ -1,3 +1,36 @@
 index:
-   path: /
-   controller: App\Controller\DefaultController::index
+  path: /
+  controller: App\Controller\DefaultController::index
+introduction:
+  path: /exercise/introduction/
+  controller: App\Controller\IntroductionController::index
+introduction/save:
+  path: /exercise/introduction/save
+  controller: App\Controller\IntroductionController::save
+web:
+  path: /exercise/web/
+  controller: App\Controller\WebFlowController::index
+native:
+  path: /exercise/native/
+  controller: App\Controller\NativeFlowController::index
+spa:
+  path: /exercise/spa/
+  controller: App\Controller\SPAFlowController::index
+device:
+  path: /exercise/device/
+  controller: App\Controller\DeviceFlowController::index
+service:
+  path: /exercise/service/
+  controller: App\Controller\ServiceFlowController::index
+openid:
+  path: /exercise/openid/
+  controller: App\Controller\OpenIDFlowController::index
+api:
+  path: /exercise/api/
+  controller: App\Controller\APIController::index
+revoke:
+  path: /exercise/revoke/
+  controller: App\Controller\RevokedController::index
+scopes:
+  path: /exercise/scopes/
+  controller: App\Controller\ScopeController::index

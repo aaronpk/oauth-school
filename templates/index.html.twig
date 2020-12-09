@@ -1,10 +1,38 @@
-{# templates/index.html.twig #} {% extends 'base.html.twig' %} 
+{# templates/index.html.twig #}
+{% extends 'base.html.twig' %}
 
 {% block title %}Welcome to OAuth School{% endblock %}
 
 {% block body %}
 
-<p>Hello World</p>
-<p>{{ date }}</p>
+<div class="container">
+  <div class="row">
+    <div class="col-md-10 ml-md-auto">
+
+      <p>Please note, this website is a companion to the course OAuth 2.0 Simplified by Aaron Parecki. You should enroll for that course if you'd like to use this website, as the instructions for using it are only in the course.</p>
+
+      <h2>Exercises for Client Developers</h2>
+
+      <ul>
+        <li><a href="{{ path('introduction') }}">Getting Started</a></li>
+        <li><a href="{{ path('web') }}">OAuth for Web Applications</a></li>
+        <li><a href="{{ path('native') }}">OAuth for Native Applications</a></li>
+        <li><a href="{{ path('spa') }}">OAuth for Single-Page Applications</a></li>
+        <li><a href="{{ path('device') }}">OAuth for IoT and Smart Devices</a></li>
+        <li><a href="{{ path('service') }}">OAuth for Machine-to-Machine Applications</a></li>
+        <li><a href="{{ path('openid') }}">OpenID Connect</a></li>
+      </ul>
+
+      <h2>Exercises for API Developers</h2>
+
+      <ul>
+        <li><a href="{{ path('api') }}">Protecting an API with OAuth</a></li>
+        <li><a href="{{ path('revoke') }}">Revoking an Access Token</a></li>
+        <li><a href="{{ path('scopes') }}">Enforcing Scopes in Your API</a></li>
+      </ul>
+
+    </div>
+  </div>
+</div>
 
 {% endblock %}

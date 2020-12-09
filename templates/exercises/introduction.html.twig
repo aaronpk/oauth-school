@@ -1,0 +1,53 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Introduction - OAuth School{% endblock %}
+
+{% block body %}
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-10 ml-md-auto">
+
+      <p>In this exercise you'll create a new Okta developer account and enter your Issuer URL. Please make sure to also add at least one custom scope and make that scope available in your server's public metadata.</p>
+
+      <p><a href="https://www.udemy.com/course/draft/3681884/learn/practice/1261722#overview">View the Exercise</a></p>
+
+      <div class="card bg-light mb-3 mt-3">
+        <div class="card-body">
+
+          {% for message in app.flashes('error') %}
+            <div class="alert alert-danger" role="alert">
+              {{ message }}
+            </div>
+          {% endfor %}
+
+          {% if scopes %}
+            <div class="alert alert-success" role="alert">
+              Great! Your issuer URL is accepted and we found {{ numScopes }} custom scopes!
+            </div>
+          {% endif %}
+
+          <form method="post" action="{{ path('introduction/save') }}">
+            <div class="mb-3">
+              <label for="issuer" class="form-label">Issuer URL</label>
+              <input type="url" class="form-control" id="issuer" name="issuer" aria-describedby="issuerHelp" placeholder="https://dev-XXXXXX.okta.com/oauth2/default" value="{{ issuer }}">
+              <div id="issuerHelp" class="form-text">We'll save the issuer URL to use it when checking your work in the following exercises</div>
+            </div>
+            {% if scopes %}
+              <div class="mb-3">
+                <label for="scopes" class="form-label">Scopes</label>
+                <input type="text" class="form-control" id="scopes" name="scopes" aria-describedby="scopesHelp" value="{{ scopeString }}" disabled>
+                <div id="issuerHelp" class="form-text">We found the following custom scopes in your OAuth server metadata</div>
+              </div>
+            {% endif %}
+            <button type="submit" class="btn btn-primary">Save</button>
+          </form>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}
