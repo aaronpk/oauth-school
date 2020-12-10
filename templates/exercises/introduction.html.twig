@@ -20,11 +20,11 @@
             </div>
           {% endfor %}
 
-          {% if scopes %}
+          {% for message in app.flashes('success') %}
             <div class="alert alert-success" role="alert">
-              Great! Your issuer URL is accepted and we found {{ numScopes }} custom scopes!
+              {{ message }}
             </div>
-          {% endif %}
+          {% endfor %}
 
           <form method="post" action="{{ path('introduction/save') }}">
             <div class="mb-3">
