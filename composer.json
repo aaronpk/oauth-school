@@ -5,6 +5,7 @@
         "ext-ctype": "*",
         "ext-iconv": "*",
         "guzzlehttp/guzzle": "^7.2",
+        "j4mie/idiorm": "^1.5",
         "predis/predis": "^1.1",
         "symfony/console": "5.2.*",
         "symfony/dotenv": "5.2.*",
@@ -57,5 +58,8 @@
             "allow-contrib": false,
             "require": "5.2.*"
         }
+    },
+    "require-dev": {
+        "symfony/maker-bundle": "^1.25"
     }
 }

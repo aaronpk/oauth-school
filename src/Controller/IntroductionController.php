@@ -6,6 +6,8 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use GuzzleHttp;
+use \Firebase\JWT\JWT;
+use \Firebase\JWT\JWK;
 
 class IntroductionController extends AbstractController {
 
@@ -22,7 +24,6 @@ class IntroductionController extends AbstractController {
     $scopes = $this->session->get('scopes');
 
     return $this->render('exercises/introduction.html.twig', [
-      'user' => false,
       'issuer' => $issuer,
       'scopes' => $scopes,
       'scopeString' => implode(' ', $scopes ?: []),
@@ -59,12 +60,34 @@ class IntroductionController extends AbstractController {
       return $this->redirectToRoute('introduction');
     }
 
-    $this->session->set('issuer', $issuer);
-
     $metadata = json_decode($res->getBody(), true);
 
     if(!$metadata) {
       $this->addFlash('error', 'The metadata URL does not contain valid JSON');
+      return $this->redirectToRoute('introduction');
+    }
+
+    // Check for the JWKs URL
+    if(!isset($metadata['jwks_uri'])) {
+      $this->addFlash('error', 'The metadata URL does not contain a jwks_uri');
+      return $this->redirectToRoute('introduction');
+    }
+
+    // Attempt to fetch the keys
+    $jwksres = $client->request('GET', $metadata['jwks_uri'], [
+      'http_errors' => false,
+    ]);
+    $code = $jwksres->getStatusCode();
+
+    if($code != 200) {
+      $this->addFlash('error', 'The jwks_uri ('.$metadata['jwks_uri'].') returned HTTP '.$code.'. Double check you entered the correct issuer URL');
+      return $this->redirectToRoute('introduction');
+    }
+
+    $jwks = json_decode($jwksres->getBody(), true);
+
+    if(!$jwks) {
+      $this->addFlash('error', 'The jwks_uri does not contain valid JSON');
       return $this->redirectToRoute('introduction');
     }
 
@@ -82,7 +105,9 @@ class IntroductionController extends AbstractController {
     }
 
     $count = count($customScopes);
+    $this->session->set('issuer', $issuer);
     $this->session->set('scopes', $customScopes);
+    $this->session->set('jwks', $jwks);
 
     return $this->redirectToRoute('introduction');
   }
