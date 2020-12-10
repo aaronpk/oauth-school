@@ -16,10 +16,6 @@ if ($_SERVER['APP_DEBUG']) {
     Debug::enable();
 }
 
-if ($trustedProxies = $_SERVER['TRUSTED_PROXIES'] ?? $_ENV['TRUSTED_PROXIES'] ?? false) {
-    Request::setTrustedProxies(explode(',', $trustedProxies), Request::HEADER_X_FORWARDED_ALL ^ Request::HEADER_X_FORWARDED_HOST);
-}
-
 $db = parse_url($_ENV['CLEARDB_DATABASE_URL'] ?? $_ENV['DATABASE_URL']);
 ORM::configure($db['scheme'].':host='.$db['host'].';dbname='.trim($db['path'],'/'));
 ORM::configure('username', $db['user']);
@@ -27,6 +23,12 @@ ORM::configure('password', $db['pass']);
 
 $kernel = new Kernel($_SERVER['APP_ENV'], (bool) $_SERVER['APP_DEBUG']);
 $request = Request::createFromGlobals();
+
+Request::setTrustedProxies(
+    [$request->server->get('REMOTE_ADDR')],
+    Request::HEADER_X_FORWARDED_ALL ^ Request::HEADER_X_FORWARDED_HOST
+);
+
 $response = $kernel->handle($request);
 $response->send();
 $kernel->terminate($request, $response);
