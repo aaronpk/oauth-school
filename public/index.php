@@ -15,6 +15,11 @@ if ($_SERVER['APP_DEBUG']) {
     Debug::enable();
 }
 
+$db = parse_url($_ENV['DATABASE_URL']);
+ORM::configure($db['scheme'].':host='.$db['host'].';dbname='.trim($db['path'],'/'));
+ORM::configure('username', $db['user']);
+ORM::configure('password', $db['pass']);
+
 $kernel = new Kernel($_SERVER['APP_ENV'], (bool) $_SERVER['APP_DEBUG']);
 $request = Request::createFromGlobals();
 $response = $kernel->handle($request);

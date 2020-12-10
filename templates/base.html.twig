@@ -6,6 +6,13 @@
   <title>{% block title %}Welcome!{% endblock %}</title>
   <link rel="stylesheet" href="/bootstrap-5.0.0-beta1-dist/css/bootstrap.min.css">
   {% block stylesheets %}{% endblock %}
+  <style>
+  .disabled {
+    opacity: 0.4;
+    pointer-events: none;
+    filter: grayscale(1);
+  }
+  </style>
 </head>
 <body>
 
