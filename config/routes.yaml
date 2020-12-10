@@ -13,6 +13,9 @@ introduction/save:
 web:
   path: /exercise/web/
   controller: App\Controller\WebFlowController::index
+web/save:
+  path: /exercise/web/save
+  controller: App\Controller\WebFlowController::save
 native:
   path: /exercise/native/
   controller: App\Controller\NativeFlowController::index

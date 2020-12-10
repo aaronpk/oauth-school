@@ -4,6 +4,7 @@
     "require": {
         "ext-ctype": "*",
         "ext-iconv": "*",
+        "firebase/php-jwt": "^5.2",
         "guzzlehttp/guzzle": "^7.2",
         "j4mie/idiorm": "^1.5",
         "predis/predis": "^1.1",

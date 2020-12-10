@@ -2,6 +2,9 @@
     "doctrine/inflector": {
         "version": "2.0.3"
     },
+    "firebase/php-jwt": {
+        "version": "v5.2.0"
+    },
     "guzzlehttp/guzzle": {
         "version": "7.2.0"
     },

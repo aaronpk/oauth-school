@@ -1,0 +1,53 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Authorization Code Flow for Web Apps - OAuth School{% endblock %}
+
+{% block body %}
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-10 ml-md-auto">
+
+      <h1>OAuth for Web Applications</h1>
+
+      <p>Use the Authorization Code flow with PKCE to get an access token, and paste the entire response from the token endpoint in the box to check your work. (Note, only do this for accounts you've created specifically for this course, never paste access tokens from production systems in random websites!)</p>
+
+      {% if app.session.get('issuer') == false %}
+        <div class="alert alert-warning" role="alert">
+          <div>You need to complete the first exercise and enter your server's issuer URL before you can continue!</div>
+          <div><a href="{{ path('introduction') }}">Back to Exercise 1</a></div>
+        </div>
+      {% endif %}
+
+      <div class="card bg-light mb-3 mt-3 {{ app.session.get('issuer') ? '' : 'disabled' }}">
+        <div class="card-body">
+
+          {% for message in app.flashes('error') %}
+            <div class="alert alert-danger" role="alert">
+              {{ message }}
+            </div>
+          {% endfor %}
+
+          {% for message in app.flashes('success') %}
+            <div class="alert alert-success" role="alert">
+              {{ message }}
+            </div>
+          {% endfor %}
+
+          <form method="post" action="{{ path('web/save') }}">
+            <div class="mb-3">
+              <label for="tokenResponse" class="form-label">Token Response</label>
+              <textarea class="form-control" name="tokenResponse" aria-describedby="tokenHelp" rows="8" placeholder="{&#13;  &quot;token_type&quot;: &quot;Bearer&quot;,&#13;  ...&#13;}"></textarea>
+              <div id="tokenHelp" class="form-text">Use the authorization code flow to get an access token, then paste the entire token response JSON here to check your work</div>
+            </div>
+            <button type="submit" class="btn btn-primary">Check Your Work</button>
+          </form>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}

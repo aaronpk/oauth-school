@@ -1,4 +1,5 @@
 <?php
+define('JSON_PP', JSON_PRETTY_PRINT+JSON_UNESCAPED_SLASHES);
 
 use App\Kernel;
 use Symfony\Component\Dotenv\Dotenv;
