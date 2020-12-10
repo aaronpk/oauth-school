@@ -14,7 +14,7 @@
       <h2>Exercises for Client Developers</h2>
 
       <ul>
-        <li><a href="{{ path('introduction') }}">Getting Started</a></li>
+        <li>{{ status['introduction'] ? '&check;' : '' }} <a href="{{ path('introduction') }}">Getting Started</a></li>
         <li><a href="{{ path('web') }}">OAuth for Web Applications</a></li>
         <li><a href="{{ path('native') }}">OAuth for Native Applications</a></li>
         <li><a href="{{ path('spa') }}">OAuth for Single-Page Applications</a></li>

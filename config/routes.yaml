@@ -10,6 +10,9 @@ introduction:
 introduction/save:
   path: /exercise/introduction/save
   controller: App\Controller\IntroductionController::save
+introduction/check:
+  path: /exercise/introduction/check
+  controller: App\Controller\IntroductionController::check
 web:
   path: /exercise/web/
   controller: App\Controller\WebFlowController::index

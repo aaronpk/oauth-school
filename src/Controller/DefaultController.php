@@ -15,7 +15,17 @@ class DefaultController extends AbstractController {
   }
 
   public function index(): Response {
+
+    $exercises = [
+      'introduction', 'web',
+    ];
+    $status = [];
+    foreach($exercises as $key) {
+      $status[$key] = $this->session->get('complete_'.$key);
+    }
+
     return $this->render('index.html.twig', [
+      'status' => $status,
     ]);
   }
 

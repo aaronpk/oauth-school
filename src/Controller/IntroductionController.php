@@ -14,12 +14,16 @@ class IntroductionController extends ExerciseController {
 
     $issuer = $this->session->get('issuer');
     $scopes = $this->session->get('scopes');
+    $authorization_endpoint = $this->session->get('authorization_endpoint');
+    $token_endpoint = $this->session->get('token_endpoint');
 
     return $this->render('exercises/introduction.html.twig', [
       'issuer' => $issuer,
       'scopes' => $scopes,
       'scopeString' => implode(' ', $scopes ?: []),
       'numScopes' => count($scopes ?: []),
+      'authorization_endpoint' => $authorization_endpoint,
+      'token_endpoint' => $token_endpoint,
     ]);
   }
 
@@ -117,6 +121,8 @@ class IntroductionController extends ExerciseController {
     $this->session->set('issuer', $issuer);
     $this->session->set('scopes', $customScopes);
     $this->session->set('jwks', $jwks);
+    $this->session->set('expected_authorization_endpoint', $metadata['authorization_endpoint']);
+    $this->session->set('expected_token_endpoint', $metadata['token_endpoint']);
 
     $record = ORM::for_table('issuers')->where('uri', $issuer)->find_one();
     if(!$record) {
@@ -131,6 +137,50 @@ class IntroductionController extends ExerciseController {
     return $this->_respondWithSuccess($redirectToRoute,
       'Great! Your issuer URL is accepted and we found '.$count.' custom scopes!',
       json_encode(['iss'=>$issuer, 'scopes'=>$customScopes], JSON_PP));
+
+    return $this->redirectToRoute('introduction');
+  }
+
+  public function check(Request $request): Response {
+
+    $redirectToRoute = 'introduction';
+
+    $expected_authorization_endpoint = $this->session->get('expected_authorization_endpoint');
+    $expected_token_endpoint = $this->session->get('expected_token_endpoint');
+
+    // Check that the endpoints they entered match what we expect from the metadata URL
+
+    if(!$this->session->get('authorization_endpoint')) {
+      $authorization_endpoint = $request->request->get('authorization_endpoint');
+
+      if($authorization_endpoint != $expected_authorization_endpoint) {
+        return $this->_respondWithError($redirectToRoute,
+          'The authorization endpoint you entered is not correct, try again!',
+          json_encode(['entered' => $authorization_endpoint, 'expected' => $expected_authorization_endpoint], JSON_PP)
+        );
+      }
+
+      $this->session->set('authorization_endpoint', $authorization_endpoint);
+    }
+
+    if(!$this->session->get('token_endpoint')) {
+      $token_endpoint = $request->request->get('token_endpoint');
+
+      if($token_endpoint != $expected_token_endpoint) {
+        return $this->_respondWithError($redirectToRoute,
+          'The token endpoint you entered is not correct, try again!',
+          json_encode(['entered' => $token_endpoint, 'expected' => $expected_token_endpoint], JSON_PP)
+        );
+      }
+
+      $this->session->set('token_endpoint', $token_endpoint);
+    }
+
+    $this->session->set('complete_introduction', true);
+
+    return $this->_respondWithSuccess($redirectToRoute,
+      'Great! You\'ve found the authorization and token endpoints!',
+      json_encode(['authorization_endpoint'=>$expected_authorization_endpoint, 'token_endpoint'=>$expected_token_endpoint], JSON_PP));
 
     return $this->redirectToRoute('introduction');
   }
