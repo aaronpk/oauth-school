@@ -19,28 +19,49 @@
         </div>
       {% endif %}
 
+      {% for message in app.flashes('error') %}
+        <div class="alert alert-danger" role="alert">
+          {{ message }}
+        </div>
+      {% endfor %}
+
+      {% for message in app.flashes('success') %}
+        <div class="alert alert-success" role="alert">
+          {{ message }}
+        </div>
+      {% endfor %}
+
+
+      <h2>Authorization Request</h2>
       <div class="card bg-light mb-3 mt-3 {{ app.session.get('issuer') ? '' : 'disabled' }}">
         <div class="card-body">
 
-          {% for message in app.flashes('error') %}
-            <div class="alert alert-danger" role="alert">
-              {{ message }}
+          <form method="post" action="{{ path('web/authz') }}">
+            <div class="mb-3">
+              <textarea class="form-control" name="authorizationURL" aria-describedby="authorizationURLHelp" rows="4" placeholder="https://dev-XXXXXX.okta.com/oauth...">{{ app.session.flashbag.has('authorizationURL') ? app.session.flashbag.get('authorizationURL')[0] : '' }}</textarea>
+              <div id="authorizationURLHelp" class="form-text">Create the initial URL for the authorization request and paste it above. Once it's correct, you'll be able to click the "Log In" button to visit that URL</div>
             </div>
-          {% endfor %}
+            {% if app.session.flashbag.has('loginURL') %}
+              <a href="{{ app.session.flashbag.get('loginURL')[0] }}" class="btn btn-primary" target="_blank">Log In</a>
+            {% else %}
+              <button type="submit" class="btn btn-primary">Check Your URL</button>
+            {% endif %}
+          </form>
 
-          {% for message in app.flashes('success') %}
-            <div class="alert alert-success" role="alert">
-              {{ message }}
-            </div>
-          {% endfor %}
+        </div>
+      </div>
+
+
+      <h2>Token Response</h2>
+      <div class="card bg-light mb-3 mt-3 {{ app.session.get('issuer') ? '' : 'disabled' }}">
+        <div class="card-body">
 
           <form method="post" action="{{ path('web/save') }}">
             <div class="mb-3">
-              <label for="tokenResponse" class="form-label">Token Response</label>
               <textarea class="form-control" name="tokenResponse" aria-describedby="tokenHelp" rows="8" placeholder="{&#13;  &quot;token_type&quot;: &quot;Bearer&quot;,&#13;  ...&#13;}"></textarea>
               <div id="tokenHelp" class="form-text">Use the authorization code flow to get an access token, then paste the entire token response JSON here to check your work</div>
             </div>
-            <button type="submit" class="btn btn-primary">Check Your Work</button>
+            <button type="submit" class="btn btn-primary">Check Your Response</button>
           </form>
 
         </div>

@@ -16,6 +16,9 @@ introduction/check:
 web:
   path: /exercise/web/
   controller: App\Controller\WebFlowController::index
+web/authz:
+  path: /exercise/web/authz
+  controller: App\Controller\WebFlowController::authz
 web/save:
   path: /exercise/web/save
   controller: App\Controller\WebFlowController::save

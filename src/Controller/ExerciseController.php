@@ -51,9 +51,14 @@ class ExerciseController extends AbstractController {
     return $this->redirectToRoute($route);
   }
 
-  protected function _respondWithSuccess($route, $message, $data) {
+  protected function _respondWithSuccess($route, $message, $data, $flash=[]) {
     $this->addFlash('success', $message);
     $this->_logResult($route, 1, $message, $data);
+    if($flash) {
+      foreach($flash as $k=>$v) {
+        $this->addFlash($k, $v);
+      }
+    }
     return $this->redirectToRoute($route);
   }
 
