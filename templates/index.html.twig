@@ -15,7 +15,7 @@
 
       <ul>
         {% for key, name in exercises['client'] %}
-          <li>{{ status[key] ? '&check;' : '' }} <a href="{{ key }}">{{ name }}</a></li>
+          <li>{{ status[key] ? '&check;' : '&#9711;' }} <a href="{{ path(key) }}">{{ name }}</a></li>
         {% endfor %}
       </ul>
 
@@ -23,7 +23,7 @@
 
       <ul>
         {% for key, name in exercises['server'] %}
-          <li>{{ status[key] ? '&check;' : '' }} <a href="{{ key }}">{{ name }}</a></li>
+          <li>{{ status[key] ? '&check;' : '&#9711;' }} <a href="{{ path(key) }}">{{ name }}</a></li>
         {% endfor %}
       </ul>
 
