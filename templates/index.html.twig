@@ -14,21 +14,17 @@
       <h2>Exercises for Client Developers</h2>
 
       <ul>
-        <li>{{ status['introduction'] ? '&check;' : '' }} <a href="{{ path('introduction') }}">Getting Started</a></li>
-        <li><a href="{{ path('web') }}">OAuth for Web Applications</a></li>
-        <li><a href="{{ path('native') }}">OAuth for Native Applications</a></li>
-        <li><a href="{{ path('spa') }}">OAuth for Single-Page Applications</a></li>
-        <li><a href="{{ path('device') }}">OAuth for IoT and Smart Devices</a></li>
-        <li><a href="{{ path('service') }}">OAuth for Machine-to-Machine Applications</a></li>
-        <li><a href="{{ path('openid') }}">OpenID Connect</a></li>
+        {% for key, name in exercises['client'] %}
+          <li>{{ status[key] ? '&check;' : '' }} <a href="{{ key }}">{{ name }}</a></li>
+        {% endfor %}
       </ul>
 
       <h2>Exercises for API Developers</h2>
 
       <ul>
-        <li><a href="{{ path('api') }}">Protecting an API with OAuth</a></li>
-        <li><a href="{{ path('revoke') }}">Revoking an Access Token</a></li>
-        <li><a href="{{ path('scopes') }}">Enforcing Scopes in Your API</a></li>
+        {% for key, name in exercises['server'] %}
+          <li>{{ status[key] ? '&check;' : '' }} <a href="{{ key }}">{{ name }}</a></li>
+        {% endfor %}
       </ul>
 
     </div>
