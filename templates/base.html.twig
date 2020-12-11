@@ -39,5 +39,8 @@
 
   <script src="/bootstrap-5.0.0-beta1-dist/js/bootstrap.min.js"></script>
   {% block javascripts %}{% endblock %}
+  {% if fathom_src %}
+    <script src="{{ fathom_src }}" data-site="{{ fathom_site }}" defer></script>
+  {% endif %}
 </body>
 </html>

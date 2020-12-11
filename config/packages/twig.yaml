@@ -1,2 +1,5 @@
 twig:
     default_path: '%kernel.project_dir%/templates'
+    globals:
+        fathom_src: '%env(FATHOM_SRC)%'
+        fathom_site: '%env(FATHOM_SITE)%'
