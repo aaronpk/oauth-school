@@ -10,16 +10,9 @@ use ORM;
 
 class WebFlowController extends ExerciseController {
 
-  public function index(): Response {
+  use AuthorizationFlowTrait;
 
-    $issuer = $this->session->get('issuer');
-    $scopes = $this->session->get('scopes');
-
-    return $this->render('exercises/web.html.twig', [
-      'issuer' => $issuer,
-      'scopes' => $scopes,
-    ]);
-  }
+  private $pageTitle = 'Authorization Code Flow for Web Apps';
 
   public function authz(Request $request): Response {
 
