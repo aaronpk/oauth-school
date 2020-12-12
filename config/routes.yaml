@@ -25,6 +25,12 @@ web/save:
 native:
   path: /exercise/native/
   controller: App\Controller\NativeFlowController::index
+native/authz:
+  path: /exercise/native/authz
+  controller: App\Controller\NativeFlowController::authz
+native/save:
+  path: /exercise/native/save
+  controller: App\Controller\NativeFlowController::save
 spa:
   path: /exercise/spa/
   controller: App\Controller\SPAFlowController::index
