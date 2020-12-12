@@ -12,8 +12,8 @@ class NativeFlowController extends ExerciseController {
 
   use AuthorizationFlowTrait;
 
-  private $pageTitle = 'Authorization Code Flow for Native Apps';
-  private $baseRoute = 'native';
+  protected $pageTitle = 'Authorization Code Flow for Native Apps';
+  protected $baseRoute = 'native';
 
   public function save(Request $request): Response {
 

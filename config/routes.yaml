@@ -34,6 +34,12 @@ native/save:
 spa:
   path: /exercise/spa/
   controller: App\Controller\SPAFlowController::index
+spa/authz:
+  path: /exercise/spa/authz
+  controller: App\Controller\SPAFlowController::authz
+spa/save:
+  path: /exercise/spa/save
+  controller: App\Controller\SPAFlowController::save
 device:
   path: /exercise/device/
   controller: App\Controller\DeviceFlowController::index

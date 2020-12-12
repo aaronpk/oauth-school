@@ -12,8 +12,8 @@ class WebFlowController extends ExerciseController {
 
   use AuthorizationFlowTrait;
 
-  private $pageTitle = 'Authorization Code Flow for Web Apps';
-  private $baseRoute = 'web';
+  protected $pageTitle = 'Authorization Code Flow for Web Apps';
+  protected $baseRoute = 'web';
 
   public function save(Request $request): Response {
 
