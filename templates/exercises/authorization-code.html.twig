@@ -36,7 +36,7 @@
       <div class="card bg-light mb-3 mt-3 {{ app.session.get('issuer') ? '' : 'disabled' }}">
         <div class="card-body">
 
-          <form method="post" action="{{ path('web/authz') }}">
+          <form method="post" action="{{ path(base_route ~ '/authz') }}">
             <div class="mb-3">
               <textarea class="form-control" name="authorizationURL" aria-describedby="authorizationURLHelp" rows="4" placeholder="https://dev-XXXXXX.okta.com/oauth..." {{ app.session.flashbag.has('loginURL') ? 'readonly' }}>{{ app.session.flashbag.has('authorizationURL') ? app.session.flashbag.get('authorizationURL')[0] : '' }}</textarea>
               <div id="authorizationURLHelp" class="form-text">Create the initial URL for the authorization request and paste it above. Once it's correct, a "Log In" button with that URL will appear below</div>
@@ -57,7 +57,7 @@
       <div class="card bg-light mb-3 mt-3 {{ app.session.get('issuer') ? '' : 'disabled' }}">
         <div class="card-body">
 
-          <form method="post" action="{{ path('web/save') }}">
+          <form method="post" action="{{ path(base_route ~ '/save') }}">
             <div class="mb-3">
               <textarea class="form-control" name="tokenResponse" aria-describedby="tokenHelp" rows="8" placeholder="{&#13;  &quot;token_type&quot;: &quot;Bearer&quot;,&#13;  ...&#13;}"></textarea>
               <div id="tokenHelp" class="form-text">Use the authorization code flow to get an access token, then paste the entire token response JSON here to check your work</div>
