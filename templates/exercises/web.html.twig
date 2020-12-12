@@ -38,11 +38,12 @@
 
           <form method="post" action="{{ path('web/authz') }}">
             <div class="mb-3">
-              <textarea class="form-control" name="authorizationURL" aria-describedby="authorizationURLHelp" rows="4" placeholder="https://dev-XXXXXX.okta.com/oauth...">{{ app.session.flashbag.has('authorizationURL') ? app.session.flashbag.get('authorizationURL')[0] : '' }}</textarea>
-              <div id="authorizationURLHelp" class="form-text">Create the initial URL for the authorization request and paste it above. Once it's correct, you'll be able to click the "Log In" button to visit that URL</div>
+              <textarea class="form-control" name="authorizationURL" aria-describedby="authorizationURLHelp" rows="4" placeholder="https://dev-XXXXXX.okta.com/oauth..." {{ app.session.flashbag.has('loginURL') ? 'readonly' }}>{{ app.session.flashbag.has('authorizationURL') ? app.session.flashbag.get('authorizationURL')[0] : '' }}</textarea>
+              <div id="authorizationURLHelp" class="form-text">Create the initial URL for the authorization request and paste it above. Once it's correct, a "Log In" button with that URL will appear below</div>
             </div>
             {% if app.session.flashbag.has('loginURL') %}
               <a href="{{ app.session.flashbag.get('loginURL')[0] }}" class="btn btn-primary" target="_blank">Log In</a>
+              <a href="" class="btn">Reset</a>
             {% else %}
               <button type="submit" class="btn btn-primary">Check Your URL</button>
             {% endif %}

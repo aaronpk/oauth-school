@@ -121,6 +121,7 @@ class IntroductionController extends ExerciseController {
     $this->session->set('issuer', $issuer);
     $this->session->set('scopes', $customScopes);
     $this->session->set('jwks', $jwks);
+    $this->session->set('introspection_endpoint', $metadata['introspection_endpoint']);
     $this->session->set('expected_authorization_endpoint', $metadata['authorization_endpoint']);
     $this->session->set('expected_token_endpoint', $metadata['token_endpoint']);
 
