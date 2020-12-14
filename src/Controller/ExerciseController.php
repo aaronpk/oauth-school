@@ -34,6 +34,12 @@ class ExerciseController extends AbstractController {
     }
   }
 
+  protected function _additionalAuthzChecks($authorizationURL, $queryParams, $scopesRequested) {
+    // Override to insert additional checks of the authorization request.
+    // Return true to indicate all checks passed.
+    return true;
+  }
+
   protected function _logResult($test, $success, $message, $data) {
     $record = ORM::for_table('results')->create();
     $record->issuer_id = ($this->_getIssuer() ? $this->_getIssuer()->id : 0);

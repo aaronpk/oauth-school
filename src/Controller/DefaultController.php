@@ -18,17 +18,18 @@ class DefaultController extends AbstractController {
 
     $exercises = [
       'client' => [
-        'introduction' => 'Getting Started', 
-        'web' => 'OAuth for Web Applications', 
-        'native' => 'OAuth for Native Applications', 
-        'spa' => 'OAuth for Single-Page Applications', 
-        'device' => 'OAuth for IoT and Smart Devices', 
-        'service' => 'OAuth for Machine-to-Machine Applications', 
+        'introduction' => 'Getting Started',
+        'web' => 'OAuth for Web Applications',
+        #'native' => 'OAuth for Native Applications',
+        #'spa' => 'OAuth for Single-Page Applications',
+        #'device' => 'OAuth for IoT and Smart Devices',
+        #'service' => 'OAuth for Machine-to-Machine Applications',
+        'refresh' => 'Refresh Tokens',
         'openid' => 'OpenID Connect',
       ],
       'server' => [
-        'api' => 'Protecting an API with OAuth', 
-        'revoke' => 'Revoking an Access Token', 
+        'api' => 'Protecting an API with OAuth',
+        'revoke' => 'Revoking an Access Token',
         'scopes' => 'Enforcing Scopes in Your API',
       ],
     ];

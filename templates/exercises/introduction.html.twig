@@ -9,6 +9,12 @@
     <div class="col-md-10 ml-md-auto">
       <h1>Getting Started</h1>
 
+      {% if app.session.get('complete_introduction') %}
+        <div class="alert alert-success alert-large">
+          <i class="fas fa-check-circle"></i> You have completed this exercise!
+        </div>
+      {% endif %}
+
       <p>In this exercise you'll create a new Okta developer account and enter your Issuer URL. Please make sure to also add at least one custom scope and make that scope available in your server's public metadata.</p>
 
       <div class="card bg-light mb-3 mt-3">

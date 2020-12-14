@@ -13,12 +13,13 @@
 
       <h2>Exercises for Client Developers</h2>
 
-      <ul>
+      <ul class="exercises">
         {% for key, name in exercises['client'] %}
-          <li>{{ status[key] ? '&check;' : '&#9711;' }} <a href="{{ path(key) }}">{{ name }}</a></li>
+          <li><i class="icon {{ status[key] ? 'fas fa-check-circle' : 'far fa-circle' }}"></i> <a href="{{ path(key) }}">{{ name }}</a></li>
         {% endfor %}
       </ul>
 
+      <!--
       <h2>Exercises for API Developers</h2>
 
       <ul>
@@ -26,9 +27,28 @@
           <li>{{ status[key] ? '&check;' : '&#9711;' }} <a href="{{ path(key) }}">{{ name }}</a></li>
         {% endfor %}
       </ul>
+      -->
 
     </div>
   </div>
 </div>
+<style>
+ul.exercises {
+  list-style-type: none;
+  padding: 0;
+}
+ul.exercises li {
+  display: flex;
+  margin-bottom: 6px;
+}
+ul.exercises li a {
+  font-size: 24px;
+  text-decoration: none;
+}
+ul.exercises .icon {
+  font-size: 36px;
+  margin-right: 4px;
+}
+</style>
 
 {% endblock %}

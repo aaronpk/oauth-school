@@ -38,7 +38,7 @@ trait AuthorizationFlowTrait {
         $authorizationURL);
     }
 
-    $authorizationURL = preg_replace('/[\s+]/', '', $authorizationURL);
+    $authorizationURL = preg_replace('/[\s]+/', '', $authorizationURL);
 
     $this->addFlash('authorizationURL', $authorizationURL);
 
@@ -101,15 +101,19 @@ trait AuthorizationFlowTrait {
 
     // check that the requested the custom scope they added
     $scopesRequested = explode(' ', $query['scope']);
+
     if(!array_intersect($scopesRequested, $scopes)) {
       return $this->_respondWithError($redirectToRoute,
         'Make sure you request one of the custom scopes you configured for this exercise',
         $authorizationURL);
     }
 
-
     // TODO: possible future checks based on what people get wrong most often
 
+    $addl = $this->_additionalAuthzChecks($authorizationURL, $query, $scopesRequested);
+    if($addl !== true) {
+      return $addl;
+    }
 
     // Everything checked out, log a success
     return $this->_respondWithSuccess(
@@ -121,19 +125,20 @@ trait AuthorizationFlowTrait {
 
   }
 
+  private $tokenResponse;
   private $tokenString;
   private $tokenData;
   private $header;
   private $claimsString;
   private $claims;
 
-  private function _initialAccessTokenChecks(Request $request) {
+  private function _initialAccessTokenChecks(Request $request, $opts=[]) {
 
     $redirectToRoute = $this->baseRoute;
 
     $scopes = $this->session->get('scopes');
 
-    $tokenResponse = $request->request->get('tokenResponse');
+    $tokenResponse = $this->tokenResponse = $request->request->get('tokenResponse');
 
     if(!$tokenResponse) {
       return $this->_respondWithError($redirectToRoute,
@@ -157,11 +162,13 @@ trait AuthorizationFlowTrait {
         $tokenResponse);
     }
 
-    // Check that the response does not include a refresh token
-    if(isset($response['refresh_token'])) {
-      return $this->_respondWithError($redirectToRoute,
-        'We found a refresh token, but you should not have one at this point. Make sure you\'ve followed the instructions for this exercise exactly and are requesting only an access token.',
-        $tokenResponse);
+    if(!isset($opts['allowRefreshToken'])) {
+      // Check that the response does not include a refresh token
+      if(isset($response['refresh_token'])) {
+        return $this->_respondWithError($redirectToRoute,
+          'We found a refresh token, but you should not have one at this point. Make sure you\'ve followed the instructions for this exercise exactly and are requesting only an access token.',
+          $tokenResponse);
+      }
     }
 
     // Check that the response does not include an ID token

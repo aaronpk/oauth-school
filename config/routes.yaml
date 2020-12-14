@@ -40,6 +40,18 @@ spa/authz:
 spa/save:
   path: /exercise/spa/save
   controller: App\Controller\SPAFlowController::save
+refresh:
+  path: /exercise/refresh/
+  controller: App\Controller\RefreshTokenController::index
+refresh/authz:
+  path: /exercise/refresh/authz
+  controller: App\Controller\RefreshTokenController::authz
+refresh/save:
+  path: /exercise/refresh/save
+  controller: App\Controller\RefreshTokenController::save
+refresh/refresh:
+  path: /exercise/refresh/refresh
+  controller: App\Controller\RefreshTokenController::refresh
 device:
   path: /exercise/device/
   controller: App\Controller\DeviceFlowController::index
