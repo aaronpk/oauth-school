@@ -58,6 +58,9 @@ device:
 service:
   path: /exercise/service/
   controller: App\Controller\ServiceFlowController::index
+service/save:
+  path: /exercise/service/save
+  controller: App\Controller\ServiceFlowController::save
 openid:
   path: /exercise/openid/
   controller: App\Controller\OpenIDFlowController::index
