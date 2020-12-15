@@ -12,11 +12,15 @@
 
       {% if app.session.get('complete_' ~ base_route) %}
         <div class="alert alert-success alert-large">
-          <i class="fas fa-check-circle"></i> You have completed this exercise!
+          <p><i class="fas fa-check-circle"></i> You have completed this exercise!</p>
+          {% if base_route == "openid" and app.session.get('openid_claims') %}
+            <p>email: <code>{{ app.session.get('openid_email')|e }}</code></p>
+            <p>name: <code>{{ app.session.get('openid_name')|e }}</code></p>
+          {% endif %}
         </div>
       {% endif %}
 
-      <p>Use the Authorization Code flow with PKCE to get an access token, and paste the entire response from the token endpoint in the box to check your work. (Note, only do this for accounts you've created specifically for this course, never paste access tokens from production systems in random websites!)</p>
+      <p>Use the Authorization Code flow with PKCE, and paste the entire response from the token endpoint in the box to check your work. (Note, only do this for accounts you've created specifically for this course, never paste access tokens from production systems in random websites!)</p>
 
       {% if app.session.get('issuer') == false %}
         <div class="alert alert-warning" role="alert">

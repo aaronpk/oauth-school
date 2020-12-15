@@ -61,6 +61,12 @@ service:
 openid:
   path: /exercise/openid/
   controller: App\Controller\OpenIDFlowController::index
+openid/authz:
+  path: /exercise/openid/authz
+  controller: App\Controller\OpenIDFlowController::authz
+openid/save:
+  path: /exercise/openid/save
+  controller: App\Controller\OpenIDFlowController::save
 api:
   path: /exercise/api/
   controller: App\Controller\APIController::index
