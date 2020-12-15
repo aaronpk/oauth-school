@@ -20,6 +20,7 @@ trait AuthorizationFlowTrait {
       'issuer' => $issuer,
       'scopes' => $scopes,
       'base_route' => $this->baseRoute,
+      'token_response_help' => $this->tokenResponseHelpText,
     ]);
   }
 
@@ -102,10 +103,12 @@ trait AuthorizationFlowTrait {
     // check that the requested the custom scope they added
     $scopesRequested = explode(' ', $query['scope']);
 
-    if(!array_intersect($scopesRequested, $scopes)) {
-      return $this->_respondWithError($redirectToRoute,
-        'Make sure you request one of the custom scopes you configured for this exercise',
-        $authorizationURL);
+    if($this->requireCustomScopeInAuthz) {
+      if(!array_intersect($scopesRequested, $scopes)) {
+        return $this->_respondWithError($redirectToRoute,
+          'Make sure you request one of the custom scopes you configured for this exercise',
+          $authorizationURL);
+      }
     }
 
     // TODO: possible future checks based on what people get wrong most often

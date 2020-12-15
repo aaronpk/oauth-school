@@ -9,6 +9,9 @@ class ExerciseController extends AbstractController {
 
   protected $session;
 
+  protected $requireCustomScopeInAuthz = true;
+  protected $tokenResponseHelpText = 'Use the authorization code flow to get an access token, then paste the entire token response JSON here to check your work';
+
   public function __construct(SessionInterface $session)
   {
     $this->session = $session;
