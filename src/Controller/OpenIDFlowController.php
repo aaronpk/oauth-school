@@ -8,6 +8,7 @@ use \Firebase\JWT\JWT;
 use \Firebase\JWT\JWK;
 use ORM;
 
+
 class OpenIDFlowController extends ExerciseController {
 
   use AuthorizationFlowTrait;
@@ -17,7 +18,23 @@ class OpenIDFlowController extends ExerciseController {
 
   protected $requireCustomScopeInAuthz = false;
 
-  protected $tokenResponseHelpText = 'Use the authorization code flow to get an ID token, then paste the entire token response JSON here to check your work';
+  public function index(Request $request): Response {
+
+    if($request->query->get('reset')) {
+      $this->session->remove('openid_claims');
+    }
+
+    $issuer = $this->session->get('issuer');
+    $scopes = $this->session->get('scopes');
+
+    return $this->render('exercises/openid.html.twig', [
+      'page_title' => $this->pageTitle,
+      'issuer' => $issuer,
+      'scopes' => $scopes,
+      'base_route' => $this->baseRoute,
+      'id_token' => $this->session->get('openid_idtoken'),
+    ]);
+  }
 
   protected function _additionalAuthzChecks($authorizationURL, $queryParams, $scopesRequested) {
 
@@ -108,17 +125,60 @@ class OpenIDFlowController extends ExerciseController {
 
     $this->_updateEmailForIssuer($claims['email']);
 
-    $this->session->set('openid_name', $claims['name']);
-    $this->session->set('openid_email', $claims['email']);
+    $this->session->set('openid_idtoken', $tokenString);
     $this->session->set('openid_claims', $claims);
 
+    return $this->_respondWithSuccess(
+      $this->baseRoute,
+      'Great! Next you need to extract the claims component of the ID token to find the user\'s name and email address.',
+      $this->claimsString
+    );
+  }
+
+  public function claims(Request $request): Response {
+
+    if(!$this->session->get('openid_claims')) {
+      return $this->_respondWithError($this->baseRoute,
+        'Make sure you finish the first part of the exercise first',
+        '');
+    }
+
+    $claims = $this->session->get('openid_claims');
+
+    $input = [
+      'sub' => $request->request->get('openid_sub'),
+      'email' => $request->request->get('openid_name'),
+      'name' => $request->request->get('openid_name'),
+      'claims' => $claims,
+    ];
+
+    if($claims['sub'] != $request->request->get('openid_sub')) {
+      return $this->_respondWithError($this->baseRoute,
+        'The subject you entered didn\'t match the one found in the ID token. Try again!',
+        json_encode($input));
+    }
+
+    if($claims['email'] != $request->request->get('openid_email')) {
+      return $this->_respondWithError($this->baseRoute,
+        'The email you entered didn\'t match the one found in the ID token. Try again!',
+        json_encode($input));
+    }
+
+    if($claims['name'] != $request->request->get('openid_name')) {
+      return $this->_respondWithError($this->baseRoute,
+        'The name you entered didn\'t match the one found in the ID token. Try again!',
+        json_encode($input));
+    }
+
+    $this->session->set('openid_name', $claims['name']);
+    $this->session->set('openid_email', $claims['email']);
 
     $this->session->set('complete_openid', true);
 
     return $this->_respondWithSuccess(
       $this->baseRoute,
-      'Great! The ID token is valid and contains the user\'s name and email address! You\'ve completed this exercise!',
-      $this->claimsString
+      'Great work! You found the user\'s name and email address from the ID token!',
+      $this->session->get('openid_idtoken')
     );
   }
 

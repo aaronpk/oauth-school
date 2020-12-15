@@ -3,3 +3,7 @@
   font-size: 24px;
   margin: 1em 0;
 }
+
+textarea.code {
+  font-family: var(--bs-font-monospace);
+}

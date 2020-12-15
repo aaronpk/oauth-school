@@ -20,7 +20,6 @@ trait AuthorizationFlowTrait {
       'issuer' => $issuer,
       'scopes' => $scopes,
       'base_route' => $this->baseRoute,
-      'token_response_help' => $this->tokenResponseHelpText,
     ]);
   }
 

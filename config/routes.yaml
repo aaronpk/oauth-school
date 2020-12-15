@@ -67,6 +67,9 @@ openid/authz:
 openid/save:
   path: /exercise/openid/save
   controller: App\Controller\OpenIDFlowController::save
+openid/claims:
+  path: /exercise/openid/claims
+  controller: App\Controller\OpenIDFlowController::claims
 api:
   path: /exercise/api/
   controller: App\Controller\APIController::index

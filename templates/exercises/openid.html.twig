@@ -13,10 +13,13 @@
       {% if app.session.get('complete_' ~ base_route) %}
         <div class="alert alert-success alert-large">
           <i class="fas fa-check-circle"></i> You have completed this exercise!
+          {% if app.session.get('openid_email') %}
+            <br>
+            email: <code>{{ app.session.get('openid_email')|e }}</code><br>
+            name: <code>{{ app.session.get('openid_name')|e }}</code>
+          {% endif %}
         </div>
       {% endif %}
-
-      <p>Use the Authorization Code flow with PKCE, and paste the entire response from the token endpoint in the box to check your work. (Note, only do this for accounts you've created specifically for this course, never paste access tokens from production systems in random websites!)</p>
 
       {% if app.session.get('issuer') == false %}
         <div class="alert alert-warning" role="alert">
@@ -36,6 +39,10 @@
           {{ message }}
         </div>
       {% endfor %}
+
+      {% if(app.session.get('openid_claims') == null) %}
+
+      <p>Use the Authorization Code flow with PKCE, and paste the entire response from the token endpoint in the box to check your work. (Note, only do this for accounts you've created specifically for this course, never paste access tokens from production systems in random websites!)</p>
 
       <h2>Authorization Request</h2>
       <div class="card bg-light mb-3 mt-3 {{ app.session.get('issuer') ? '' : 'disabled' }}">
@@ -57,7 +64,6 @@
         </div>
       </div>
 
-
       <h2>Token Response</h2>
       <div class="card bg-light mb-3 mt-3 {{ app.session.get('issuer') ? '' : 'disabled' }}">
         <div class="card-body">
@@ -65,13 +71,47 @@
           <form method="post" action="{{ path(base_route ~ '/save') }}">
             <div class="mb-3">
               <textarea class="form-control" name="tokenResponse" aria-describedby="tokenHelp" rows="8" placeholder="{&#13;  &quot;token_type&quot;: &quot;Bearer&quot;,&#13;  ...&#13;}"></textarea>
-              <div id="tokenHelp" class="form-text">Use the authorization code flow to get an access token, then paste the entire token response JSON here to check your work</div>
+              <div id="tokenHelp" class="form-text">Use the authorization code flow to get an ID token, then paste the entire token response JSON here to check your work</div>
             </div>
             <button type="submit" class="btn btn-primary">Check Your Response</button>
           </form>
 
         </div>
       </div>
+
+      {% endif %}
+
+
+      <h2>ID Token Claims</h2>
+      <div class="card bg-light mb-3 mt-3 {{ app.session.get('issuer') and app.session.get('openid_claims') ? '' : 'disabled' }}">
+        <div class="card-body">
+
+          <p>The ID token returned from the token endpoint is below.</p>
+
+          <p><textarea class="form-control code" rows="10" readonly>{{ id_token }}</textarea></p>
+
+          <p>Parse the claims from the JWT using a <a href="https://example-app.com/base64" target="_blank">Base64 decoder</a> and paste the user's subject, name and email address into the form below. Remember that because you got this ID token over the back channel, you don't need to worry about verifying the JWT signature.</p>
+
+          <form method="post" action="{{ path(base_route ~ '/claims') }}">
+            <div class="mb-3">
+              <label for="openid_sub" class="form-label">Subject (<code>sub</code>)</label>
+              <input type="text" class="form-control" name="openid_sub">
+            </div>
+            <div class="mb-3">
+              <label for="openid_email" class="form-label">Email address</label>
+              <input type="email" class="form-control" name="openid_email" placeholder="user@example.com">
+            </div>
+            <div class="mb-3">
+              <label for="openid_name" class="form-label">Name</label>
+              <input type="text" class="form-control" name="openid_name">
+            </div>
+            <button type="submit" class="btn btn-primary">Verify</button>
+            <a href="?reset=1" class="btn">Reset</a>
+          </form>
+
+        </div>
+      </div>
+
 
     </div>
   </div>
