@@ -17,8 +17,6 @@ class WebFlowController extends ExerciseController {
 
   public function save(Request $request): Response {
 
-    $redirectToRoute = $this->baseRoute;
-
     if($errorResponse = $this->_initialAccessTokenChecks($request)) {
       return $errorResponse;
     }
@@ -35,14 +33,14 @@ class WebFlowController extends ExerciseController {
         ],
       ]);
     } catch(\Exception $e) {
-      return $this->_respondWithError($redirectToRoute,
+      return $this->_respondWithError($this->baseRoute,
         'There was an unexpected error when validating this request: '.$e->getMessage(),
         $this->claimsString);
     }
     $code = $res->getStatusCode();
 
     if($code != 401) {
-      return $this->_respondWithError($redirectToRoute,
+      return $this->_respondWithError($this->baseRoute,
         'We tried introspecting the token and it succeeded, indicating this access token was issued to a public client. Make sure you\'ve chosen "Web Application" when creating this app so that you have a client secret. ',
         $this->claimsString);
     }
@@ -51,7 +49,7 @@ class WebFlowController extends ExerciseController {
 
     // Everything checked out, log a success
     return $this->_respondWithSuccess(
-      $redirectToRoute,
+      $this->baseRoute,
       'Great! The access token is valid! You\'ve completed this exercise!',
       $this->claimsString
     );
