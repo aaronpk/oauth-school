@@ -9,9 +9,22 @@
   <div class="row">
     <div class="col-md-10 ml-md-auto">
 
-      <p>Please note, this website is a companion to the course OAuth 2.0 Simplified by Aaron Parecki. You should enroll for that course if you'd like to use this website, as the instructions for using it are only in the course.</p>
+      <div id="header-image"><a href="https://www.udemy.com/course/oauth-2-simplified/?referralCode=B04F59AED67B8DA74FA7"></a></div>
 
-      <h2>Exercises for Client Developers</h2>
+      <h2>The Nuts and Bolts of OAuth 2.0</h2>
+
+      <p>This website is a companion to the course <a href="https://www.udemy.com/course/oauth-2-simplified/?referralCode=B04F59AED67B8DA74FA7">The Nuts and Bolts of OAuth 2.0</a> by Aaron Parecki. You should enroll in the course if you'd like to use this website!</p>
+
+      <h3>What You'll Learn</h3>
+      <p>OAuth 2.0, OpenID, PKCE, deprecated flows, JWTs, API Gateways, and scopes. No programming knowledge needed.</p>
+      <ul class="learn">
+        <li>&check; The basics of OAuth 2.0 and OpenID Connect</li>
+        <li>&check; Best practices for developing OAuth applications (server-side, native, and SPAs)</li>
+        <li>&check; How to implement an OAuth client from scratch</li>
+        <li>&check; How to protect an API with JWT access tokens</li>
+      </ul>
+
+      <h2>Exercises</h2>
 
       <ul class="exercises">
         {% for key, name in exercises['client'] %}
@@ -33,6 +46,25 @@
   </div>
 </div>
 <style>
+#header-image {
+  background: url(/img/course-header.png);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  width: 100%;
+  height: 200px;
+  margin-bottom: 1em;
+}
+#header-image a {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+ul.learn {
+  list-style-type: none;
+  padding: 0;
+  padding-left: 20px;
+}
 ul.exercises {
   list-style-type: none;
   padding: 0;
