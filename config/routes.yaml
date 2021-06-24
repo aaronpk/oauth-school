@@ -82,3 +82,19 @@ revoke:
 scopes:
   path: /exercise/scopes/
   controller: App\Controller\ScopeController::index
+
+challenge:
+  path: /challenge/
+  controller: App\Controller\ChallengeController::challenge
+
+challenge/1:
+  path: /challenge/1
+  controller: App\Controller\ChallengeController::challenge1
+challenge/1/start:
+  path: /challenge/1/start
+  controller: App\Controller\ChallengeController::challenge1start
+challenge/1/save:
+  path: /challenge/1/save
+  controller: App\Controller\ChallengeController::challenge1save
+
+

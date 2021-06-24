@@ -41,7 +41,7 @@ class WebFlowController extends ExerciseController {
 
     if($code != 401) {
       return $this->_respondWithError($this->baseRoute,
-        'We tried introspecting the token and it succeeded, indicating this access token was issued to a public client. Make sure you\'ve chosen "Web Application" when creating this app so that you have a client secret. ',
+        'It looks like this access token was issued to a public client. Make sure you\'ve chosen "Web Application" when creating this app so that you have a client secret, and try again.',
         $this->claimsString);
     }
 

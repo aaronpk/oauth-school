@@ -1,0 +1,89 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ page_title }} - OAuth School{% endblock %}
+
+{% block body %}
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-10 ml-md-auto">
+
+      <h1>{{ page_title }}</h1>
+
+      <p>Use the Authorization Code flow to get an access token from your own Okta Developer account. Paste the token below to score your progress.</p>
+
+      <p>(Note: only use an Okta Developer account you've created specifically for this challenge, never paste access tokens from production systems in random websites like this!)</p>
+
+
+      {% for message in app.flashes('error') %}
+        <div class="alert alert-danger" role="alert">
+          {{ message }}
+        </div>
+      {% endfor %}
+
+
+      SUCCESS MESSAGE
+
+
+      <div class="card bg-light {{ app.session.get('issuer') ? '' : 'disabled' }}">
+        <div class="card-body">
+
+          <div class="container">
+            <div class="row">
+              <div class="col">
+                <b>Progress</b>
+
+                <ul class="checklist">
+                  <li class="active">
+                    <i class="{{ status.active ? 'fas true fa-check-circle' : 'far false fa-times-circle' }}"></i> must be active (not expired)
+                  </li>
+                  <li class="issued_before">
+                    <i class="{{ status.issued_before ? 'fas true fa-check-circle' : 'far false fa-times-circle' }}"></i> must be issued <i>before</i><br>{{ max_issued_at | date("F j, Y H:i") }} UTC
+                  </li>
+                  <li class="confidential">
+                    <i class="{{ status.confidential ? 'fas true fa-check-circle' : 'far false fa-times-circle' }}"></i> must be issued to a confidential client
+                  </li>
+                  <li class="lifetime">
+                    <i class="{{ status.lifetime ? 'fas true fa-check-circle' : 'far false fa-times-circle' }}"></i> must last for more than 2 hours
+                  </li>
+                  <li class="scope">
+                    <i class="{{ status.scope ? 'fas true fa-check-circle' : 'far false fa-times-circle' }}"></i> must include the scope <code>workshop</code>
+                  </li>
+                  <li class="custom_claim">
+                    <i class="{{ status.custom_claim ? 'fas true fa-check-circle' : 'far false fa-times-circle' }}"></i> must include the custom claim <code>favorite_color</code>
+                  </li>
+                </ul>
+
+              </div>
+              <div class="col-8">
+                <form method="post" action="{{ path(base_route ~ '/1/save') }}">
+                  <div class="mb-3">
+                    <div id="tokenHelp" class="form-text">Paste an access token below</div>
+                    <textarea class="form-control" name="token" aria-describedby="tokenHelp" rows="8" placeholder=""></textarea>
+                  </div>
+                  <button type="submit" class="btn btn-primary">Validate</button>
+                </form>
+
+                <br><br>
+
+                {% if(claims_json) %}
+                  <p>Claims found in your access token:</p>
+                  <pre class="claims">{{ claims_json }}</pre>
+                {% endif %}
+
+              </div>
+
+            </div>
+          </div>
+
+
+        </div>
+      </div>
+
+
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}

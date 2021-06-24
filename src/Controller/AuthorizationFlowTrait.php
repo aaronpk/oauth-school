@@ -220,13 +220,6 @@ trait AuthorizationFlowTrait {
           'The access token is missing some required claims. Try again by using the authorization code flow.',
           $claimsString);
       }
-
-      // Check that the sub is an email. This is expected for Okta access tokens
-      if(!preg_match('/.+@.+\..+/', $claims['sub'])) {
-        return $this->_respondWithError($this->baseRoute,
-          'The `sub` claim in Okta access tokens is an email address. Make sure you are getting a user to log in and using the authorization code flow.',
-          $claimsString);
-      }
     }
 
     // Now attempt to verify the token using the JWKs from the metadata URL

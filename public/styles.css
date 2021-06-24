@@ -7,3 +7,20 @@
 textarea.code {
   font-family: var(--bs-font-monospace);
 }
+
+ul.checklist {
+	margin: 0; 
+	padding: 0;
+	list-style-type: none;
+	margin-left: 1em;
+}
+ul.checklist li {
+	text-indent: -0.6em;
+}
+
+ul.checklist i.false {
+	color: red;
+}
+ul.checklist i.true {
+	color: green;
+}
