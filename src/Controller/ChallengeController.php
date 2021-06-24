@@ -46,18 +46,32 @@ class ChallengeController extends ExerciseController {
   }
 
   public function challenge1start(Request $request): Response {
+
+    $status = $this->initialStatus;
+
+    if($this->session->get('challenge-1') == 'complete') {
+      foreach($status as $k=>$v) {
+        $status[$k] = true;
+      }
+    }
+
     return $this->render('challenges/challenge-1.html.twig', [
       'page_title' => $this->pageTitle,
       'base_route' => $this->baseRoute,
       'max_issued_at' => new DateTime($this->maxIssuedAt),
-      'status' => $this->initialStatus,
-      'claims_json' => null,
+      'status' => $status,
+      'claims_json' => $this->session->get('challenge-1-claims'),
+      'complete' => ($this->session->get('challenge-1') == 'complete'),
     ]);
   }
 
   public function challenge1save(Request $request): Response {
 
     $route = 'challenge/1/start';
+
+    if($request->isMethod('GET')) {
+      return $this->redirectToRoute($route);
+    }
 
     $tokenString = $this->tokenString = $request->request->get('token');
 
@@ -218,14 +232,17 @@ class ChallengeController extends ExerciseController {
 
     // If all values are true (if there are no false values) they succeeded!
     if(in_array(false, $status, true) === false) {
-      // Set a value in the session and redirect to the form to collect their shipping info
       $this->session->set('challenge-1', 'complete');
-      // TODO
+    } else {
+      $this->session->remove('challenge-1');
     }
 
     $claimsJson = json_encode($claims, JSON_PRETTY_PRINT+JSON_UNESCAPED_SLASHES);
+    $this->session->set('challenge-1-claims', $claimsJson);
 
     // Log the status of this attempt in the database
+
+
 
 
     return $this->render('challenges/challenge-1.html.twig', [
@@ -233,8 +250,25 @@ class ChallengeController extends ExerciseController {
       'base_route' => $this->baseRoute,
       'max_issued_at' => new DateTime($this->maxIssuedAt),
       'status' => $status,
-      'claims_json' => $claimsJson
+      'claims_json' => $claimsJson,
+      'complete' => ($this->session->get('challenge-1') == 'complete'),
     ]);
+  }
+
+
+  public function challenge1claim(Request $request): Response {
+
+
+    return $this->render('challenges/challenge-1-claim.html.twig', [
+      'page_title' => $this->pageTitle,
+      'base_route' => $this->baseRoute,
+    ]);
+  }
+
+  public function challenge1reset(Request $request): Response {
+    $this->session->remove('challenge-1');
+    $this->session->remove('challenge-1-claims');
+    return $this->redirectToRoute('challenge/1/start');
   }
 
 }

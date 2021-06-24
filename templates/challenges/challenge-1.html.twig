@@ -22,7 +22,11 @@
       {% endfor %}
 
 
-      SUCCESS MESSAGE
+      {% if complete %}
+        <div class="alert alert-success" role="alert">
+          Congratulations! You completed the challenge! <a href="{{ path(base_route ~ '/1/claim') }}">Claim your prize!</a>
+        </div>
+      {% endif %}
 
 
       <div class="card bg-light {{ app.session.get('issuer') ? '' : 'disabled' }}">
@@ -56,6 +60,8 @@
 
               </div>
               <div class="col-8">
+
+                {% if not complete %}
                 <form method="post" action="{{ path(base_route ~ '/1/save') }}">
                   <div class="mb-3">
                     <div id="tokenHelp" class="form-text">Paste an access token below</div>
@@ -63,12 +69,18 @@
                   </div>
                   <button type="submit" class="btn btn-primary">Validate</button>
                 </form>
-
                 <br><br>
+                {% endif %}
 
                 {% if(claims_json) %}
                   <p>Claims found in your access token:</p>
                   <pre class="claims">{{ claims_json }}</pre>
+                {% endif %}
+
+                {% if complete %}
+                  <div style="font-size: 0.8em; text-align: right;">
+                    <a href="{{ path(base_route ~ '/1/reset') }}">Start Over</a>
+                  </div>
                 {% endif %}
 
               </div>

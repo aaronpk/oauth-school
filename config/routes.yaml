@@ -96,5 +96,11 @@ challenge/1/start:
 challenge/1/save:
   path: /challenge/1/save
   controller: App\Controller\ChallengeController::challenge1save
+challenge/1/claim:
+  path: /challenge/1/claim
+  controller: App\Controller\ChallengeController::challenge1claim
+challenge/1/reset:
+  path: /challenge/1/reset
+  controller: App\Controller\ChallengeController::challenge1reset
 
 
