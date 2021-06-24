@@ -42,7 +42,7 @@
 
       {% if(app.session.get('openid_claims') == null) %}
 
-      <p>Use the Authorization Code flow with PKCE, and paste the entire response from the token endpoint in the box to check your work. (Note, only do this for accounts you've created specifically for this course, never paste access tokens from production systems in random websites!)</p>
+      <p>Use the Authorization Code flow with PKCE, and paste the entire response from the token endpoint in the box to check your work. (Note: only do this for accounts you've created specifically for this course, never paste access tokens from production systems in random websites like this!)</p>
 
       <h2>Authorization Request</h2>
       <div class="card bg-light mb-3 mt-3 {{ app.session.get('issuer') ? '' : 'disabled' }}">

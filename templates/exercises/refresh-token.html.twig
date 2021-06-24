@@ -16,7 +16,7 @@
         </div>
       {% endif %}
 
-      <p>Use the Authorization Code flow with PKCE to get an access token, and paste the entire response from the token endpoint in the box to check your work. Then, use the refresh token to get a new access token. (Note, only do this for accounts you've created specifically for this course, never paste access tokens from production systems in random websites!)</p>
+      <p>Use the Authorization Code flow with PKCE to get an access token, and paste the entire response from the token endpoint in the box to check your work. Then, use the refresh token to get a new access token. (Note: only do this for accounts you've created specifically for this course, never paste access tokens from production systems in random websites like this!)</p>
 
       {% if app.session.get('issuer') == false %}
         <div class="alert alert-warning" role="alert">
