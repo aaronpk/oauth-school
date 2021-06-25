@@ -45,6 +45,8 @@ class RefreshTokenController extends ExerciseController {
 
   public function save(Request $request): Response {
 
+    $redirectToRoute = $this->baseRoute;
+
     if($errorResponse = $this->_initialAccessTokenChecks($request, [
       'allowRefreshToken' => true
     ])) {
@@ -57,7 +59,7 @@ class RefreshTokenController extends ExerciseController {
     if(!isset($response['refresh_token'])) {
       return $this->_respondWithError($redirectToRoute,
         'The response from the token endpoint did not contain a refresh token. Double check that you\'ve enabled the Refresh Token grant for this client in the application\'s settings, and make sure you request a token with the offline_access scope.',
-        $tokenResponse);
+        $this->tokenResponse);
     }
 
     $this->session->set('refresh_token_response_1', $this->tokenString);
