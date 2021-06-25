@@ -6,13 +6,77 @@
 
 <div class="container">
   <div class="row">
-    <div class="col-md-10 ml-md-auto">
+    <div class="col-md-3"></div>
+    <div class="col-md-6 ml-md-auto">
 
       <h1>{{ page_title }}</h1>
 
+      <br>
 
+      {% if complete %}
 
+        <div class="alert alert-success" role="alert">
+          Great! We've got your info and will be sending out the prizes shortly!
+        </div>
 
+      {% else %}
+
+        <form action="{{ path('challenge/1/claimsave') }}" method="post">
+
+          {% if first_winner %}
+
+            <div style="margin: 10px;"><img style="max-width: 100%; display: block; margin: auto;" src="/img/yubikeys.png"></div>
+
+            <div class="alert alert-success" role="alert">
+              Congrats! You are the first winner of the challenge and won the <b>grand prize</b>, a Yubikey of your choice! You will also get a copy of Aaron Parecki's book <a href="https://oauth2simplified.com">OAuth 2.0 Simplified</a>.
+            </div>
+
+            <div class="mb-3">
+              <select class="form-select" name="prize">
+                <option selected>Choose your YubiKey</option>
+                <option value="5c-nano" {{ data.prize == '5c-nano' ? 'selected' : '' }}>YubiKey 5C Nano</option>
+                <option value="5-nano" {{ data.prize == '5-nano' ? 'selected' : '' }}>YubiKey 5 Nano</option>
+                <option value="5-nfc" {{ data.prize == '5-nfc' ? 'selected' : '' }}>YubiKey 5 NFC</option>
+                <option value="5ci"> {{ data.prize == '5ci' ? 'selected' : '' }}YubiKey 5Ci</option>
+              </select>
+            </div>
+
+          {% else %}
+
+            <div style="margin-bottom: 1em;"><img style="max-width: 100%; display: block; margin: auto;" src="/img/book.jpg"></div>
+
+            <div class="alert alert-success" role="alert">
+              Congrats! While you weren't the winner of the grand prize, you still win a copy of Aaron Parecki's book <a href="https://oauth2simplified.com">OAuth 2.0 Simplified</a>!
+            </div>
+
+          {% endif %}
+
+          <div class="mb-3">
+            <label for="email" class="form-label">Email Address</label>
+            <input type="email" class="form-control" name="email" placeholder="name@example.com" value="{{ data.email }}">
+          </div>
+
+          <div class="mb-3">
+            <label for="name" class="form-label">Your Name</label>
+            <input type="text" class="form-control" name="name" value="{{ data.name }}">
+          </div>
+
+          <div class="mb-3">
+            <label for="address" class="form-label">Shipping Address</label>
+            <textarea class="form-control" name="address" rows="3" placeholder="">{{ data.address }}</textarea>
+          </div>
+
+          <div class="mb-3">
+            <label for="phone" class="form-label">Phone Number (for shipping)</label>
+            <input type="phone" class="form-control" name="phone" value="{{ data.phone }}">
+          </div>
+
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+
+        <br><br><br>
+
+      {% endif %}
 
     </div>
   </div>

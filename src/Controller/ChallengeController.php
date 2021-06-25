@@ -28,6 +28,22 @@ class ChallengeController extends ExerciseController {
   ];
 
 
+  protected function _getParticipant($issuer) {
+    $p = ORM::for_table('challenge_participants')->where('issuer', $issuer)->find_one();
+
+    if(!$p) {
+      $p = ORM::for_table('challenge_participants')->create();
+      $p->issuer = $issuer;
+      $p->created_at = date('Y-m-d H:i:s');
+      $p->attempts = 0;
+    }
+
+    $p->updated_at = date('Y-m-d H:i:s');
+
+    return $p;
+  }
+
+
   public function challenge(Request $request): Response {
 
 
@@ -184,6 +200,8 @@ class ChallengeController extends ExerciseController {
 
 
 
+    $this->session->set('challenge-1-issuer', $issuer);
+
 
     $status = $this->initialStatus;
     $status['active'] = true; // JWT validation checks this
@@ -241,9 +259,14 @@ class ChallengeController extends ExerciseController {
     $this->session->set('challenge-1-claims', $claimsJson);
 
     // Log the status of this attempt in the database
-
-
-
+    $record = $this->_getParticipant($issuer);
+    $record->complete = $this->session->get('challenge-1') == 'complete';
+    foreach($status as $k=>$v) {
+      $record->{'status_'.$k} = $v;
+    }
+    $record->attempts++;
+    $record->claims = $claimsJson;
+    $record->save();
 
     return $this->render('challenges/challenge-1.html.twig', [
       'page_title' => $this->pageTitle,
@@ -257,17 +280,84 @@ class ChallengeController extends ExerciseController {
 
 
   public function challenge1claim(Request $request): Response {
+    // Make sure they actually completed the challenge
+    if($this->session->get('challenge-1') != 'complete')
+      return $this->redirectToRoute('challenge/1');
 
+    $claims = json_decode($this->session->get('challenge-1-claims'), true);
+
+    $data['email'] = '';
+    if(isset($claims['sub']) && preg_match('/.+@.+\..+/', $claims['sub']))
+      $data['email'] = $claims['sub'];
+
+    $data['name'] = $claims['name'] ?? '';
+
+    $data['address'] = '';
+    $data['phone'] = '';
+    $data['prize'] = '';
+
+    $fields = ['email','name','address','phone'];
+    foreach($fields as $f) {
+      if($this->session->get($f))
+        $data[$f] = $this->session->get($f);
+    }
+
+    $complete = (in_array(false, $data) === false);
+
+    // Add this back after checking if the fields they filled out were complete
+    if($this->session->get('prize'))
+      $data['prize'] = $this->session->get('prize');
+
+    // Figure out if they were the first winner
+    $issuer = $this->session->get('challenge-1-issuer');
+    $participant = $this->_getParticipant($issuer);
+    if($participant->id)
+      $winners = ORM::for_table('challenge_winners')->where_not_equal('participant_id', $participant->id)->count();
+    else
+      $winners = ORM::for_table('challenge_winners')->count();
+    $first_winner = $winners == 0;
 
     return $this->render('challenges/challenge-1-claim.html.twig', [
-      'page_title' => $this->pageTitle,
+      'page_title' => 'Claim your prize!',
       'base_route' => $this->baseRoute,
+      'claims' => $claims,
+      'data' => $data,
+      'first_winner' => $first_winner,
+      'complete' => $complete,
     ]);
   }
 
+  public function challenge1claimsave(Request $request): Response {
+    if($this->session->get('challenge-1') != 'complete')
+      return $this->redirectToRoute('challenge/1');
+
+
+    $fields = ['email','name','address','phone','prize'];
+
+    foreach($fields as $f) {
+      $this->session->set($f, $request->request->get($f));
+    }
+
+    $issuer = $this->session->get('challenge-1-issuer');
+    $participant = $this->_getParticipant($issuer);
+
+    $winner = ORM::for_table('challenge_winners')->where('participant_id', $participant->id)->find_one();
+    if(!$winner) {
+      $winner = ORM::for_table('challenge_winners')->create();
+      $winner->participant_id = $participant->id;
+      $winner->created_at = date('Y-m-d H:i:s');
+    }
+    foreach($fields as $f) {
+      $winner->{$f} = $request->request->get($f);
+    }
+    $winner->save();
+
+
+    return $this->redirectToRoute('challenge/1/claim');
+  }
+
   public function challenge1reset(Request $request): Response {
-    $this->session->remove('challenge-1');
-    $this->session->remove('challenge-1-claims');
+    $this->session->clear();
     return $this->redirectToRoute('challenge/1/start');
   }
 
