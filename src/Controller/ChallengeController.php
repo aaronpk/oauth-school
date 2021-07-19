@@ -16,7 +16,7 @@ class ChallengeController extends ExerciseController {
   protected $pageTitle = 'OAuth Workshop Challenge';
   protected $baseRoute = 'challenge';
 
-  protected $maxIssuedAt = '2021-06-25T19:00:00Z';
+  protected $maxIssuedAt = '2021-07-20T14:00:00-0700';
 
   protected $initialStatus = [
     'issued_before' => false,
