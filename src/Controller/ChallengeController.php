@@ -312,9 +312,14 @@ class ChallengeController extends ExerciseController {
     $issuer = $this->session->get('challenge-1-issuer');
     $participant = $this->_getParticipant($issuer);
     if($participant->id)
-      $winners = ORM::for_table('challenge_winners')->where_not_equal('participant_id', $participant->id)->count();
+      $winners = ORM::for_table('challenge_winners')
+        ->where('archived', 0)
+        ->where_not_equal('participant_id', $participant->id)
+        ->count();
     else
-      $winners = ORM::for_table('challenge_winners')->count();
+      $winners = ORM::for_table('challenge_winners')
+        ->where('archived', 0)
+        ->count();
     $first_winner = $winners == 0;
 
     return $this->render('challenges/challenge-1-claim.html.twig', [

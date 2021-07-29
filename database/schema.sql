@@ -45,5 +45,6 @@ CREATE TABLE `challenge_winners` (
   `phone` varchar(255) DEFAULT NULL,
   `prize` varchar(255) DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
+  `archived` tinyint(4) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
