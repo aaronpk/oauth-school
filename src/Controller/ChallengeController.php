@@ -294,7 +294,6 @@ class ChallengeController extends ExerciseController {
 
     $data['address'] = '';
     $data['phone'] = '';
-    $data['prize'] = '';
 
     $fields = ['email','name','address','phone'];
     foreach($fields as $f) {
@@ -305,6 +304,7 @@ class ChallengeController extends ExerciseController {
     $complete = (in_array(false, $data) === false);
 
     // Add this back after checking if the fields they filled out were complete
+    $data['prize'] = '';
     if($this->session->get('prize'))
       $data['prize'] = $this->session->get('prize');
 
