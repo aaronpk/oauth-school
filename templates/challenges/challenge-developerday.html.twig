@@ -25,6 +25,7 @@
       {% if complete %}
         <div class="alert alert-success" role="alert">
           <p>Congratulations! You completed the challenge!</p>
+          <a href="{{ path(base_route ~ '/1/claim') }}" class="btn btn-success">Claim your prize!</a>
         </div>
       {% endif %}
 
