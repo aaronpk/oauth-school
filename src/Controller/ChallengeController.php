@@ -239,7 +239,7 @@ class ChallengeController extends ExerciseController {
     }
 
     // Look for the required scope
-    if(isset($claims['scp']) && is_array($claims['scp']) && in_array('workshop', $claims['scp'])) {
+    if(isset($claims['scp']) && is_array($claims['scp']) && in_array('developerday', $claims['scp'])) {
       $status['scope'] = true;
     }
 
