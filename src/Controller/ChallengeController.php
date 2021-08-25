@@ -54,7 +54,7 @@ class ChallengeController extends ExerciseController {
   }
 
   public function challenge1(Request $request): Response {
-    return $this->render('challenges/1.html.twig', [
+    return $this->render('challenges/developerday.html.twig', [
       'page_title' => $this->pageTitle,
       'base_route' => $this->baseRoute,
       'max_issued_at' => new DateTime($this->maxIssuedAt),
@@ -268,7 +268,7 @@ class ChallengeController extends ExerciseController {
     $record->claims = $claimsJson;
     $record->save();
 
-    return $this->render('challenges/challenge-1.html.twig', [
+    return $this->render('challenges/challenge-developerday.html.twig', [
       'page_title' => $this->pageTitle,
       'base_route' => $this->baseRoute,
       'max_issued_at' => new DateTime($this->maxIssuedAt),
