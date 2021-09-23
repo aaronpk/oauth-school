@@ -16,7 +16,7 @@ class ChallengeController extends ExerciseController {
   protected $pageTitle = 'OAuth Workshop Challenge';
   protected $baseRoute = 'challenge';
 
-  protected $maxIssuedAt = '2021-09-01T23:59:59-0400';
+  protected $maxIssuedAt = '2021-09-24T23:59:59-0400';
 
   protected $initialStatus = [
     'issued_before' => false,
@@ -321,6 +321,7 @@ class ChallengeController extends ExerciseController {
         ->where('archived', 0)
         ->count();
     $first_winner = $winners == 0;
+    $first_winner = true;
 
     return $this->render('challenges/challenge-1-claim.html.twig', [
       'page_title' => 'Claim your prize!',
