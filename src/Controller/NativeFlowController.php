@@ -47,7 +47,7 @@ class NativeFlowController extends ExerciseController {
         $this->claimsString);
     }
 
-    $this->session->set('complete_'.self::$baseRouteStatic, true);
+    $this->session->set('complete_'.static::$baseRouteStatic, true);
 
     // Everything checked out, log a success
     return $this->_respondWithSuccess(
