@@ -14,6 +14,7 @@ class NativeFlowController extends ExerciseController {
 
   protected $pageTitle = 'Authorization Code Flow for Native Apps';
   protected $baseRoute = 'native';
+  protected static $baseRouteStatic = 'native';
 
   public function save(Request $request): Response {
 
@@ -46,7 +47,7 @@ class NativeFlowController extends ExerciseController {
         $this->claimsString);
     }
 
-    $this->session->set('complete_native', true);
+    $this->session->set('complete_'.self::$baseRouteStatic, true);
 
     // Everything checked out, log a success
     return $this->_respondWithSuccess(

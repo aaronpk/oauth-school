@@ -12,5 +12,6 @@ class SPAFlowController extends NativeFlowController {
 
   protected $pageTitle = 'Authorization Code Flow for Single-Page Apps';
   protected $baseRoute = 'spa';
+  protected static $baseRouteStatic = 'spa';
 
 }
