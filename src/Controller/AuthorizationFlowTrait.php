@@ -79,15 +79,24 @@ trait AuthorizationFlowTrait {
     $required = ['response_type', 'scope', 'client_id', 'state', 'redirect_uri', 'code_challenge', 'code_challenge_method'];
 
     $missing = false;
+    $invalid = false;
     foreach($required as $key) {
       if(empty($query[$key])) {
         $missing = true;
+      } elseif(strpos($query[$key], '{') === 0) {
+        $invalid = true;
       }
     }
 
     if($missing) {
       return $this->_respondWithError($redirectToRoute,
         'It looks like you are missing some query string parameters in the URL',
+        $authorizationURL);
+    }
+
+    if($invalid) {
+      return $this->_respondWithError($redirectToRoute,
+        'Make sure you remove the placeholder brackets { } from the query string parameters!',
         $authorizationURL);
     }
 
