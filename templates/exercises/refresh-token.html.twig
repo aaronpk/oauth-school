@@ -18,7 +18,7 @@
 
       <p>Use the Authorization Code flow with PKCE to get an access token, and paste the entire response from the token endpoint in the box to check your work. Then, use the refresh token to get a new access token. (Note: only do this for accounts you've created specifically for this course, never paste access tokens from production systems in random websites like this!)</p>
 
-      {% if app.session.get('issuer') == false %}
+      {% if app.session.get('complete_introduction') == false %}
         <div class="alert alert-warning" role="alert">
           <div>You need to complete the first exercise and enter your server's issuer URL before you can continue!</div>
           <div><a href="{{ path('introduction') }}">Back to Exercise 1</a></div>
@@ -40,7 +40,7 @@
       {% if(app.session.get('refresh_token_response_1') == null) %}
 
       <h2>Authorization Request</h2>
-      <div class="card bg-light mb-3 mt-3 {{ app.session.get('issuer') ? '' : 'disabled' }}">
+      <div class="card bg-light mb-3 mt-3 {{ app.session.get('complete_introduction') ? '' : 'disabled' }}">
         <div class="card-body">
 
           <form method="post" action="{{ path(base_route ~ '/authz') }}">
@@ -61,7 +61,7 @@
 
 
       <h2>Token Response</h2>
-      <div class="card bg-light mb-3 mt-3 {{ app.session.get('issuer') ? '' : 'disabled' }}">
+      <div class="card bg-light mb-3 mt-3 {{ app.session.get('complete_introduction') ? '' : 'disabled' }}">
         <div class="card-body">
 
           <form method="post" action="{{ path(base_route ~ '/save') }}">
@@ -79,7 +79,7 @@
 
 
       <h2>Refresh Token Response</h2>
-      <div class="card bg-light mb-3 mt-3 {{ app.session.get('issuer') and app.session.get('refresh_token_response_1') ? '' : 'disabled' }}">
+      <div class="card bg-light mb-3 mt-3 {{ app.session.get('complete_introduction') and app.session.get('refresh_token_response_1') ? '' : 'disabled' }}">
         <div class="card-body">
 
           <form method="post" action="{{ path(base_route ~ '/refresh') }}">
