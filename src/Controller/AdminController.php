@@ -6,6 +6,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use GuzzleHttp;
+use ORM;
 
 class AdminController extends AbstractController {
 
@@ -14,6 +15,12 @@ class AdminController extends AbstractController {
   public function __construct(SessionInterface $session)
   {
     $this->session = $session;
+  }
+
+  private function _requireLogin() {
+    if(!$this->session->get('admin_user_id')) {
+      return $this->redirectToRoute('admin');
+    }
   }
 
   public function index(): Response {
@@ -91,4 +98,29 @@ class AdminController extends AbstractController {
 
     return $this->redirectToRoute('admin');
   }
+
+  public function challenge_winners(): Response {
+    if($r=$this->_requireLogin())
+      return $r;
+
+    $winners = ORM::for_table('challenge_winners')->order_by_desc('created_at')->find_many();
+
+    return $this->render('admin/challenge-winners.html.twig', [
+      'winners' => $winners,
+    ]);
+  }
+
+  public function challenge_winners_save(Request $request): Response {
+    if($r=$this->_requireLogin())
+      return $r;
+
+    $winner = ORM::for_table('challenge_winners')->where('id', $request->request->get('winner_id'))->find_one();
+    if($winner) {
+      $winner->archived = true;
+      $winner->save();
+    }
+
+    return $this->json(['saved' => true]);
+  }
+
 }

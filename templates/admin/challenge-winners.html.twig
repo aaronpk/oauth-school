@@ -1,0 +1,76 @@
+{# templates/index.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}OAuth School Admin{% endblock %}
+
+{% block body %}
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-10 ml-md-auto">
+
+      {% for message in app.flashes('error') %}
+        <div class="alert alert-danger" role="alert">
+          {{ message }}
+        </div>
+      {% endfor %}
+
+      <h2>Challenge Winners</h2>
+
+
+      <table class="winners">
+        <tr>
+          <th>Date</th>
+          <th>Email</th>
+          <th>Name/Address</th>
+          <th>Yubikey</th>
+          <th>Processed</th>
+        </tr>
+      {% for winner in winners %}
+        <tr>
+          <td>{{ winner['created_at'] }}</td>
+          <td>{{ winner['email'] }}</td>
+          <td>{{ winner['name'] }}<br>{{ winner['address'] }}<br>{{ winner['phone'] }}</td>
+          <td>{{ winner['prize'] }}</td>
+          <td><input type="checkbox" data-winner-id="{{ winner['id'] }}" {{ winner['archived'] ? 'checked="checked"' : '' }}></td>
+        </tr>
+      {% endfor %}
+      </table>
+
+    </div>
+  </div>
+</div>
+
+<style>
+table.winners {
+  width: 100%;
+}
+table.winners td {
+  vertical-align: top;
+  border-bottom: 1px #ccc solid;
+}
+</style>
+
+{% endblock %}
+
+
+{% block javascripts %}
+<script src="/scripts/jquery.js"></script>
+<script>
+$(function(){
+
+  $("input[data-winner-id]").click(function(){
+
+    console.log($(this).data("winner-id"));
+    console.log($(this).is(":checked"));
+
+    $.post("/admin/challenge-winners/save", {
+      winner_id: $(this).data("winner-id"),
+      archived: $(this).is(":checked")
+    });
+
+  });
+
+});
+</script>
+{% endblock %}

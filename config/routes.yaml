@@ -115,7 +115,12 @@ admin/login:
 admin/login/callback:
   path: /admin/callback
   controller: App\Controller\AdminController:login_callback
-
+admin/challenge-winners:
+  path: /admin/challenge-winners
+  controller: App\Controller\AdminController::challenge_winners
+admin/challenge-winners/save:
+  path: /admin/challenge-winners/save
+  controller: App\Controller\AdminController::challenge_winners_save
 
 
 

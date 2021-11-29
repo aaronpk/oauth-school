@@ -1,4 +1,3 @@
-{# templates/index.html.twig #}
 {% extends 'base.html.twig' %}
 
 {% block title %}OAuth School Admin{% endblock %}
@@ -20,6 +19,11 @@
 
       {% if app.session.get('admin_user_id') %}
         <p>Logged in as {{ app.session.get('admin_user_name') }}</p>
+
+        <ul>
+          <li><a href="{{ path('admin/challenge-winners') }}">Challenge Winners</a></li>
+        </ul>
+
       {% else %}
         <p><a href="{{ path('admin/login') }}">Log In</a></p>
       {% endif %}
