@@ -1,0 +1,31 @@
+{# templates/index.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}OAuth School Admin{% endblock %}
+
+{% block body %}
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-10 ml-md-auto">
+
+      {% for message in app.flashes('error') %}
+        <div class="alert alert-danger" role="alert">
+          {{ message }}
+        </div>
+      {% endfor %}
+
+      <h2>OAuth.school</h2>
+
+
+      {% if app.session.get('admin_user_id') %}
+        <p>Logged in as {{ app.session.get('admin_user_name') }}</p>
+      {% else %}
+        <p><a href="{{ path('admin/login') }}">Log In</a></p>
+      {% endif %}
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}

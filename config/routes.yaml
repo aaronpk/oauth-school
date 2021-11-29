@@ -106,4 +106,16 @@ challenge/1/reset:
   path: /challenge/1/reset
   controller: App\Controller\ChallengeController::challenge1reset
 
+admin:
+  path: /admin
+  controller: App\Controller\AdminController:index
+admin/login:
+  path: /admin/login
+  controller: App\Controller\AdminController:login_start
+admin/login/callback:
+  path: /admin/callback
+  controller: App\Controller\AdminController:login_callback
+
+
+
 
