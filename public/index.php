@@ -17,6 +17,7 @@ if ($_SERVER['APP_DEBUG']) {
 }
 
 $db = parse_url($_ENV['CLEARDB_DATABASE_URL'] ?? $_ENV['DATABASE_URL']);
+ORM::configure('driver_options', array(PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'));
 ORM::configure($db['scheme'].':host='.$db['host'].';dbname='.trim($db['path'],'/'));
 ORM::configure('username', $db['user']);
 ORM::configure('password', $db['pass']);
