@@ -30,7 +30,7 @@
         <tr>
           <td>{{ winner['created_at'] }}</td>
           <td>{{ winner['email'] }}</td>
-          <td>{{ winner['name'] }}<br>{{ winner['address'] }}<br>{{ winner['phone'] }}</td>
+          <td>{{ winner['name'] }}<br><span class="address">{{ winner['address'] }}</span><br>{{ winner['phone'] }}</td>
           <td>{{ winner['prize'] }}</td>
           <td><input type="checkbox" data-winner-id="{{ winner['id'] }}" {{ winner['archived'] ? 'checked="checked"' : '' }}></td>
         </tr>
@@ -48,6 +48,9 @@ table.winners {
 table.winners td {
   vertical-align: top;
   border-bottom: 1px #ccc solid;
+}
+table.winners .address {
+  white-space: pre-wrap;
 }
 </style>
 
