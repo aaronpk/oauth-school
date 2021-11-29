@@ -64,12 +64,9 @@ $(function(){
 
   $("input[data-winner-id]").click(function(){
 
-    console.log($(this).data("winner-id"));
-    console.log($(this).is(":checked"));
-
     $.post("/admin/challenge-winners/save", {
       winner_id: $(this).data("winner-id"),
-      archived: $(this).is(":checked")
+      archived: ($(this).is(":checked") ? 'archived' : '')
     });
 
   });

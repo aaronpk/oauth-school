@@ -114,13 +114,18 @@ class AdminController extends AbstractController {
     if($r=$this->_requireLogin())
       return $r;
 
+    $archived = $request->request->get('archived') == 'archived' ? true : false;
+
     $winner = ORM::for_table('challenge_winners')->where('id', $request->request->get('winner_id'))->find_one();
     if($winner) {
-      $winner->archived = true;
+      $winner->archived = $archived;
       $winner->save();
     }
 
-    return $this->json(['saved' => true]);
+    return $this->json([
+      'saved' => true,
+      'archived' => $archived,
+    ]);
   }
 
 }
