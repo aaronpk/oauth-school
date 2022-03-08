@@ -109,7 +109,7 @@ class IntroductionController extends ExerciseController {
         $issuer);
     }
 
-    $openIDScopes = ['openid','profile','email','address','phone','offline_access'];
+    $openIDScopes = ['openid','profile','email','address','phone','offline_access','device_sso'];
     $customScopes = array_diff($metadata['scopes_supported'], $openIDScopes);
     if(count($customScopes) == 0) {
       return $this->_respondWithError($redirectToRoute,
