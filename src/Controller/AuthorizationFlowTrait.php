@@ -160,7 +160,7 @@ trait AuthorizationFlowTrait {
 
     if(!$response || !is_array($response)) {
       return $this->_respondWithError($this->baseRoute,
-        'Make sure you enter the full response from the token endpoint, not just the access token',
+        'Make sure you enter the full JSON response from the token endpoint, not just the access token',
         $tokenResponse);
     }
 
