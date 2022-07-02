@@ -14,12 +14,14 @@ class IntroductionController extends ExerciseController {
 
     $issuer = $this->session->get('issuer');
     $scopes = $this->session->get('scopes');
+    $step2  = $this->session->get('step2');
     $authorization_endpoint = $this->session->get('authorization_endpoint');
     $token_endpoint = $this->session->get('token_endpoint');
 
     return $this->render('exercises/introduction.html.twig', [
       'issuer' => $issuer,
       'scopes' => $scopes,
+      'step2' => $step2,
       'scopeString' => implode(' ', $scopes ?: []),
       'numScopes' => count($scopes ?: []),
       'authorization_endpoint' => $authorization_endpoint,
@@ -46,33 +48,19 @@ class IntroductionController extends ExerciseController {
         $issuer);
     }
 
+
+    // First fetch the OAuth server metadata
     $metadataURL = $issuer.'/.well-known/oauth-authorization-server';
+    list($metadata, $error) = $this->_fetchMetadataURL($metadataURL);
 
-    // Fetch the URL
-    try {
-      $client = new GuzzleHttp\Client();
-      $res = $client->request('GET', $metadataURL, [
-        'http_errors' => false,
-      ]);
-    } catch(\Exception $e) {
-      return $this->_respondWithError($redirectToRoute,
-        'There was an error trying to fetch the OAuth server metadata: '.$e->getMessage(),
-        $issuer);
-    }
-    $code = $res->getStatusCode();
+    if($error) {
+      // Try fetching the OpenID Configuration next
+      $metadataURL = $issuer.'/.well-known/openid-configuration';
+      list($metadata, $error) = $this->_fetchMetadataURL($metadataURL);
 
-    if($code != 200) {
-      return $this->_respondWithError($redirectToRoute,
-        'The metadata URL ('.$metadataURL.') returned HTTP '.$code.'. Double check you entered the correct issuer URL',
-        $issuer);
-    }
-
-    $metadata = json_decode($res->getBody(), true);
-
-    if(!$metadata) {
-      return $this->_respondWithError($redirectToRoute,
-        'The metadata URL does not contain valid JSON',
-        $issuer);
+      if($error) {
+        return $this->_respondWithError($redirectToRoute, $error, $issuer);
+      }
     }
 
     // Check for the JWKs URL
@@ -81,6 +69,16 @@ class IntroductionController extends ExerciseController {
         'The metadata URL does not contain a jwks_uri',
         $issuer);
     }
+
+    $host = parse_url($issuer, PHP_URL_HOST);
+
+    $provider = 'unknown';
+    if(preg_match('/.+\.okta\.com$/', $host))
+      $provider = 'okta';
+    if(preg_match('/.+\.auth0\.com$/', $host))
+      $provider = 'auth0';
+
+    $client = new GuzzleHttp\Client();
 
     // Attempt to fetch the keys
     $jwksres = $client->request('GET', $metadata['jwks_uri'], [
@@ -109,21 +107,34 @@ class IntroductionController extends ExerciseController {
         $issuer);
     }
 
-    $openIDScopes = ['openid','profile','email','address','phone','offline_access','device_sso'];
-    $customScopes = array_diff($metadata['scopes_supported'], $openIDScopes);
-    if(count($customScopes) == 0) {
-      return $this->_respondWithError($redirectToRoute,
-        'We didn\'t find any custom scopes defined on your OAuth server. Ensure you\'ve created at least one custom scope and set it to "Include in public metadata".',
-        $issuer);
+    $openIDScopes = ['openid','profile','email','address','phone','offline_access'];
+    $oktaScopes   = ['device_sso'];
+    $auth0Scopes  = ['name','given_name','family_name','nickname','email_verified','created_at','identities','picture'];
+
+    if($provider == 'okta') {
+      $customScopes = array_diff($metadata['scopes_supported'], array_merge($openIDScopes,$oktaScopes));
+
+      if(count($customScopes) == 0) {
+        return $this->_respondWithError($redirectToRoute,
+          'We didn\'t find any custom scopes defined on your OAuth server. Ensure you\'ve created at least one custom scope and set it to "Include in public metadata".',
+          $issuer);
+      }
+
+    } elseif($provider == 'auth0') {
+      $customScopes = array_diff($metadata['scopes_supported'], array_merge($openIDScopes,$auth0Scopes));
+      // Auth0 doesn't return the scopes in the public OIDC metadata so we can't verify at this stage
+    } else {
+      $customScopes = array_diff($metadata['scopes_supported'], $openIDScopes);
     }
 
     $count = count($customScopes);
+
     $this->session->set('issuer', $issuer);
     $this->session->set('scopes', $customScopes);
     $this->session->set('jwks', $jwks);
-    $this->session->set('introspection_endpoint', $metadata['introspection_endpoint']);
-    $this->session->set('expected_authorization_endpoint', $metadata['authorization_endpoint']);
-    $this->session->set('expected_token_endpoint', $metadata['token_endpoint']);
+    $this->session->set('introspection_endpoint', $metadata['introspection_endpoint'] ?? null);
+    $this->session->set('expected_authorization_endpoint', $metadata['authorization_endpoint'] ?? null);
+    $this->session->set('expected_token_endpoint', $metadata['token_endpoint'] ?? null);
 
     $record = ORM::for_table('issuers')->where('uri', $issuer)->find_one();
     if(!$record) {
@@ -135,11 +146,42 @@ class IntroductionController extends ExerciseController {
     $record->last_logged_in_at = date('Y-m-d H:i:s');
     $record->save();
 
-    return $this->_respondWithSuccess($redirectToRoute,
-      'Great! Your issuer URL is accepted and we found '.$count.' custom scopes!',
-      json_encode(['iss'=>$issuer, 'scopes'=>$customScopes], JSON_PP));
+    if($provider == 'okta')
+      $successMessage = 'Great! Your issuer URL is accepted and we found '.$count.' custom scopes!';
+    else
+      $successMessage = 'Great! Your issuer URL is accepted!';
 
-    return $this->redirectToRoute('introduction');
+    $this->session->set('step2', true);
+
+    return $this->_respondWithSuccess($redirectToRoute,
+      $successMessage,
+      json_encode(['iss'=>$issuer, 'scopes'=>$customScopes], JSON_PP));
+  }
+
+  private function _fetchMetadataURL($metadataURL) {
+
+    // Fetch the URL
+    try {
+      $client = new GuzzleHttp\Client();
+      $res = $client->request('GET', $metadataURL, [
+        'http_errors' => false,
+      ]);
+    } catch(\Exception $e) {
+      return [null, 'There was an error trying to fetch the OAuth server metadata: '.$e->getMessage()];
+    }
+    $code = $res->getStatusCode();
+
+    if($code != 200) {
+      return [null, 'The metadata URL ('.$metadataURL.') returned HTTP '.$code.'. Double check you entered the correct issuer URL'];
+    }
+
+    $metadata = json_decode($res->getBody(), true);
+
+    if(!$metadata) {
+      return [null, 'The metadata URL does not contain valid JSON'];
+    }
+
+    return [$metadata, null];
   }
 
   public function check(Request $request): Response {
