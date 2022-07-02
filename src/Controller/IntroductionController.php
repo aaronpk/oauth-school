@@ -48,15 +48,23 @@ class IntroductionController extends ExerciseController {
         $issuer);
     }
 
+    $host = parse_url($issuer, PHP_URL_HOST);
+
+    $provider = 'unknown';
+    if(preg_match('/.+\.okta\.com$/', $host))
+      $provider = 'okta';
+    if(preg_match('/.+\.auth0\.com$/', $host))
+      $provider = 'auth0';
+
 
     // First fetch the OAuth server metadata
     $metadataURL = $issuer.'/.well-known/oauth-authorization-server';
-    list($metadata, $error) = $this->_fetchMetadataURL($metadataURL);
+    list($metadata, $error) = $this->_fetchMetadataURL($metadataURL, $provider);
 
     if($error) {
       // Try fetching the OpenID Configuration next
       $metadataURL = $issuer.'/.well-known/openid-configuration';
-      list($metadata, $error) = $this->_fetchMetadataURL($metadataURL);
+      list($metadata, $error) = $this->_fetchMetadataURL($metadataURL, $provider);
 
       if($error) {
         return $this->_respondWithError($redirectToRoute, $error, $issuer);
@@ -69,14 +77,6 @@ class IntroductionController extends ExerciseController {
         'The metadata URL does not contain a jwks_uri',
         $issuer);
     }
-
-    $host = parse_url($issuer, PHP_URL_HOST);
-
-    $provider = 'unknown';
-    if(preg_match('/.+\.okta\.com$/', $host))
-      $provider = 'okta';
-    if(preg_match('/.+\.auth0\.com$/', $host))
-      $provider = 'auth0';
 
     $client = new GuzzleHttp\Client();
 
@@ -158,7 +158,7 @@ class IntroductionController extends ExerciseController {
       json_encode(['iss'=>$issuer, 'scopes'=>$customScopes], JSON_PP));
   }
 
-  private function _fetchMetadataURL($metadataURL) {
+  private function _fetchMetadataURL($metadataURL, $provider) {
 
     // Fetch the URL
     try {
@@ -172,7 +172,12 @@ class IntroductionController extends ExerciseController {
     $code = $res->getStatusCode();
 
     if($code != 200) {
-      return [null, 'The metadata URL ('.$metadataURL.') returned HTTP '.$code.'. Double check you entered the correct issuer URL'];
+      if($provider == 'auth0' && $code == 404)
+        $errorMessage = 'Make sure you enter the issuer URL with no trailing slash. The metadata URL ('.$metadataURL.') returned HTTP '.$code;
+      else
+        $errorMessage = 'The metadata URL ('.$metadataURL.') returned HTTP '.$code.'. Double check you entered the correct issuer URL';
+
+      return [null, $errorMessage];
     }
 
     $metadata = json_decode($res->getBody(), true);
