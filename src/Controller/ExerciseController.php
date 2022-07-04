@@ -36,6 +36,18 @@ class ExerciseController extends AbstractController {
     }
   }
 
+  protected function _providerFromIssuer($issuer) {
+    $host = parse_url($issuer, PHP_URL_HOST);
+
+    if(preg_match('/.+\.okta\.com$/', $host))
+      return 'okta';
+
+    if(preg_match('/.+\.auth0\.com$/', $host))
+      return 'auth0';
+
+    return 'unknown';
+  }
+
   protected function _additionalAuthzChecks($authorizationURL, $queryParams, $scopesRequested) {
     // Override to insert additional checks of the authorization request.
     // Return true to indicate all checks passed.

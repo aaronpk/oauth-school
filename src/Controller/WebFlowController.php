@@ -21,28 +21,32 @@ class WebFlowController extends ExerciseController {
       return $errorResponse;
     }
 
-    // Attempt to introspect the token, which should fail, since introspection in this case requires a client secret.
-    // This is how we can check that they used a confidential client for this exercise and not a public client.
-    try {
-      $client = new GuzzleHttp\Client();
-      $res = $client->request('POST', $this->session->get('introspection_endpoint'), [
-        'http_errors' => false,
-        'form_params' => [
-          'token' =>$this->tokenString,
-          'client_id' => $this->claims['cid'],
-        ],
-      ]);
-    } catch(\Exception $e) {
-      return $this->_respondWithError($this->baseRoute,
-        'There was an unexpected error when validating this request: '.$e->getMessage(),
-        $this->claimsString);
-    }
-    $code = $res->getStatusCode();
+    $provider = $this->_providerFromIssuer($this->session->get('issuer'));
 
-    if($code != 401) {
-      return $this->_respondWithError($this->baseRoute,
-        'It looks like this access token was issued to a public client. Make sure you\'ve chosen "Web Application" when creating this app so that you have a client secret, and try again.',
-        $this->claimsString);
+    if($provider == 'okta') {
+      // Attempt to introspect the token, which should fail, since introspection in this case requires a client secret.
+      // This is how we can check that they used a confidential client for this exercise and not a public client.
+      try {
+        $client = new GuzzleHttp\Client();
+        $res = $client->request('POST', $this->session->get('introspection_endpoint'), [
+          'http_errors' => false,
+          'form_params' => [
+            'token' =>$this->tokenString,
+            'client_id' => $this->claims['cid'],
+          ],
+        ]);
+      } catch(\Exception $e) {
+        return $this->_respondWithError($this->baseRoute,
+          'There was an unexpected error when validating this request: '.$e->getMessage(),
+          $this->claimsString);
+      }
+      $code = $res->getStatusCode();
+
+      if($code != 401) {
+        return $this->_respondWithError($this->baseRoute,
+          'It looks like this access token was issued to a public client. Make sure you\'ve chosen "Web Application" when creating this app so that you have a client secret, and try again.',
+          $this->claimsString);
+      }
     }
 
     $this->session->set('complete_web', true);

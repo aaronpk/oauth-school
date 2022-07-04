@@ -48,14 +48,7 @@ class IntroductionController extends ExerciseController {
         $issuer);
     }
 
-    $host = parse_url($issuer, PHP_URL_HOST);
-
-    $provider = 'unknown';
-    if(preg_match('/.+\.okta\.com$/', $host))
-      $provider = 'okta';
-    if(preg_match('/.+\.auth0\.com$/', $host))
-      $provider = 'auth0';
-
+    $provider = $this->_providerFromIssuer($issuer);
 
     // First fetch the OAuth server metadata
     $metadataURL = $issuer.'/.well-known/oauth-authorization-server';

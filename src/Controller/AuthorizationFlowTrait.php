@@ -74,6 +74,8 @@ trait AuthorizationFlowTrait {
         $authorizationURL);
     }
 
+    $provider = $this->_providerFromIssuer($this->session->get('issuer'));
+
     parse_str($url['query'], $query);
 
     $required = ['response_type', 'scope', 'client_id', 'state', 'redirect_uri', 'code_challenge', 'code_challenge_method'];
@@ -111,6 +113,9 @@ trait AuthorizationFlowTrait {
     // check that the requested the custom scope they added
     $scopesRequested = explode(' ', $query['scope']);
 
+    if($provider == 'auth0')
+      $this->requireCustomScopeInAuthz = false;
+
     if($this->requireCustomScopeInAuthz) {
       if(!array_intersect($scopesRequested, $scopes)) {
         return $this->_respondWithError($redirectToRoute,
@@ -146,6 +151,7 @@ trait AuthorizationFlowTrait {
   private function _initialAccessTokenChecks(Request $request, $opts=[]) {
 
     $scopes = $this->session->get('scopes');
+    $provider = $this->_providerFromIssuer($this->session->get('issuer'));
 
     $tokenResponse = $this->tokenResponse = $request->request->get('tokenResponse');
 
@@ -194,11 +200,13 @@ trait AuthorizationFlowTrait {
         $tokenResponse);
     }
 
-    $scopesReturned = explode(' ', $response['scope']);
-    if(!is_array($scopesReturned) || !count($scopesReturned) || !count(array_intersect($scopes, $scopesReturned))) {
-      return $this->_respondWithError($this->baseRoute,
-        'Make sure you\'ve requested one of the scopes you made public. You can find the list of scopes we\'re looking for in the first exercise.',
-        $tokenResponse);
+    if($provider != 'auth0') {
+      $scopesReturned = explode(' ', $response['scope']);
+      if(!is_array($scopesReturned) || !count($scopesReturned) || !count(array_intersect($scopes, $scopesReturned))) {
+        return $this->_respondWithError($this->baseRoute,
+          'Make sure you\'ve requested one of the scopes you made public. You can find the list of scopes we\'re looking for in the first exercise.',
+          $tokenResponse);
+      }
     }
 
     // Now parse the access token
@@ -223,11 +231,23 @@ trait AuthorizationFlowTrait {
     $this->claimsString = $claimsString = json_encode($claims, JSON_PP);
 
     if(!isset($opts['clientCredentials'])) {
-      // Check for a uid and sub claim
-      if(!isset($claims['uid']) || !isset($claims['sub'])) {
-        return $this->_respondWithError($this->baseRoute,
-          'The access token is missing some required claims. Try again by using the authorization code flow.',
-          $claimsString);
+      switch($provider) {
+        case 'okta':
+          // Check for a uid and sub claim
+          if(!isset($claims['uid']) || !isset($claims['sub'])) {
+            return $this->_respondWithError($this->baseRoute,
+              'The access token doesn\'t look right. Try again by using the authorization code flow.',
+              $claimsString);
+          }
+          break;
+        case 'auth0':
+          // Check for a sub claim and make sure gty != 'client-credentials'
+          if(!isset($claims['sub']) || (isset($claims['gty']) && $claims['gty'] == 'client-credentials')) {
+            return $this->_respondWithError($this->baseRoute,
+              'The access token doesn\'t look right. Try again by using the authorization code flow.',
+              $claimsString);
+          }
+          break;
       }
     }
 
