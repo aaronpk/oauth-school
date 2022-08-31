@@ -4,7 +4,7 @@
 
 {% block body %}
 
-<div class="container">
+<div class="container guide">
   <div class="row">
     <div class="col-md-10 ml-md-auto">
       <h1>Getting Started</h1>
@@ -15,22 +15,76 @@
         </div>
       {% endif %}
 
-      <p>In this exercise you'll create a new Okta developer account and enter your Issuer URL. Please make sure to also add at least one custom scope and make that scope available in your server's public metadata.</p>
+      {% for message in app.flashes('error') %}
+        <div class="alert alert-danger" role="alert">
+          {{ message }}
+        </div>
+      {% endfor %}
+
+      {% for message in app.flashes('success') %}
+        <div class="alert alert-success" role="alert">
+          {{ message }}
+        </div>
+      {% endfor %}
+
+
+      {% if step2 == false %}
+        <p>In this exercise you'll sign up for a developer account at auth0.com to follow along with the exercises. Once you have an account, you'll be able to create applications and configure your OAuth server to follow along with the assignments.</p>
+
+        <p>Please visit <a href="https://auth0.com" target="_blank">auth0.com</a> and sign up for an account.</p>
+
+        <a href="https://auth0.com" target="_blank"><img src="/images/0-getting-started/image4.png" class="small"></a>
+
+
+        <h2>Create an API Resource</h2>
+
+        <p>First we need to create an API resource which represents an API that you would protect with Auth0 access tokens. Navigate to the sidebar Applications menu, and choose APIs. Click Create API to make a new API.</p>
+
+        <img class="small" src="/images/0-getting-started/image9.png">
+
+        <p>Give your new API a name, and choose an identifier. The identifier will be the value of the “audience” claim in the access tokens Auth0 creates, and it’s usually a good idea to use a URL that represents your API.</p>
+
+        <img class="small" src="/images/0-getting-started/image7.png">
+
+
+        <h2>Set the Default Audience</h2>
+
+        <p>Because the eventual goal is to use these access tokens with your own API, you’ll need to either set a default audience on your Auth0 tenant, or specify the audience in each authorization request. If you wanted to segment your account into multiple API resources, you would have each OAuth client specify the audience for each request. But for the purposes of this exercise, we’ll assume you have only one API resource, and set the default audience on the account.</p>
+
+        <img class="small" src="/images/0-getting-started/image2.png">
+
+        <p>From the sidebar, choose <b>Settings</b> and scroll down to <b>API Authorization Settings</b>. In the <b>Default Audience</b> field, enter the same API identifier you set for your API Resource earlier in this exercise.</p>
+
+
+
+        <h2>Find the Issuer URI</h2>
+
+        <p>The Issuer URI is the identifier of the authorization server. This will be used throughout the exercises and is used by this tool to check your work.</p>
+
+        <p>Navigate to Applications then click Applications again in the side menu. This is where you’ll be creating applications throughout these exercises. For now, you only need to find the OAuth server’s Issuer URI for your account. Auth0 doesn’t show you the issuer URI directly, but you can determine what it is from the OpenID Configuration URI it shows in an application’s advanced settings.</p>
+
+        <p>Create a new application, it doesn’t matter what type it is or what it’s called for now.</p>
+
+        <img class="small" src="/images/0-getting-started/image5.png">
+
+        <p>After the application is created, click on the Settings tab.</p>
+
+        <img class="small" src="/images/0-getting-started/image10.png">
+
+        <p>Then scroll all the way down and expand the “Advanced Settings” section, and click on the “Endpoints” tab.</p>
+
+        <img class="small" src="/images/0-getting-started/image11.png">
+
+        <p>All the URLs shown are based on the Issuer URI. You can open the <b>OpenID Configuration URL</b> in your browser and the Issuer URI will be displayed at the top.</p>
+
+        <img class="small" src="/images/0-getting-started/image13.png">
+
+        <p>Copy the <b>Issuer URI</b>, the identifier of your OAuth server, and paste it into the box below.</p>
+
+      {% endif %}
 
       <div class="card bg-light mb-3 mt-3">
         <div class="card-body">
-
-          {% for message in app.flashes('error') %}
-            <div class="alert alert-danger" role="alert">
-              {{ message }}
-            </div>
-          {% endfor %}
-
-          {% for message in app.flashes('success') %}
-            <div class="alert alert-success" role="alert">
-              {{ message }}
-            </div>
-          {% endfor %}
 
           <form method="post" action="{{ path('introduction/save') }}">
             <div class="mb-3">
@@ -49,8 +103,32 @@
               <button type="submit" class="btn btn-primary">Continue</button>
             {% endif %}
           </form>
+        </div>
+      </div>
 
-          {% if step2 %}
+      {% if step2 %}
+
+        {% if app.session.get('complete_introduction') != true %}
+
+          <h2>Find your Authorization and Token Endpoint</h2>
+
+          <p>Next you’ll need to find the server’s authorization endpoint and token endpoint for use in the later exercises. These can be found programmatically by fetching the server’s metadata URL, or by viewing the Endpoints section on an application’s Advanced Settings page.</p>
+
+          <p>From the side bar, click <b>Applications</b> and then <b>Applications</b> again. Choose the app you created in the first part of this exercise, and scroll all the way to the bottom again and expand the <b>Advanced Settings</b> section. Click on the <b>Endpoints</b> tab.</p>
+
+          <img class="small" src="/images/0-getting-started/image12.png">
+
+          <p>The two URLs you need at this step are the Authorization URL and Token URL.</p>
+
+          <p>Copy these two values somewhere you’ll be able to find them again when you start the exercises. You’ll need these throughout the rest of these exercises.</p>
+
+          <p>Check your work by entering the authorization endpoint and token endpoint URLs below.</p>
+
+        {% endif %}
+
+        <div class="card bg-light mb-3 mt-e">
+          <div class="card-body">
+
             <form method="post" action="{{ path('introduction/check') }}">
               <div class="mb-3">
                 <label for="authorization_endpoint" class="form-label">Authorization Endpoint</label>
@@ -69,10 +147,10 @@
                 <button type="submit" class="btn btn-primary">Check</button>
               {% endif %}
             </form>
-          {% endif %}
 
+          </div>
         </div>
-      </div>
+      {% endif %}
 
     </div>
   </div>

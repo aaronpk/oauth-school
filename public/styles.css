@@ -24,3 +24,18 @@ ul.checklist i.false {
 ul.checklist i.true {
 	color: green;
 }
+
+.container.guide img {
+  max-width: 100%;
+  display: block;
+  margin-bottom: 1em;
+}
+.container.guide img.small {
+  max-width: 50%;
+  margin: 0 auto;
+  display: block;
+  margin-bottom: 1em;
+}
+.container.guide h2 {
+  margin-top: 1em;
+}
