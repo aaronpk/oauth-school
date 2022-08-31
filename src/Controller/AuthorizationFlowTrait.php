@@ -78,7 +78,7 @@ trait AuthorizationFlowTrait {
 
     parse_str($url['query'], $query);
 
-    $required = ['response_type', 'scope', 'client_id', 'state', 'redirect_uri', 'code_challenge', 'code_challenge_method'];
+    $required = ['response_type', 'client_id', 'state', 'redirect_uri', 'code_challenge', 'code_challenge_method'];
 
     $missing = false;
     $invalid = false;
@@ -111,7 +111,7 @@ trait AuthorizationFlowTrait {
     }
 
     // check that the requested the custom scope they added
-    $scopesRequested = explode(' ', $query['scope']);
+    $scopesRequested = !empty($query['scope']) ? explode(' ', $query['scope']) : [];
 
     if($provider == 'auth0')
       $this->requireCustomScopeInAuthz = false;
@@ -193,15 +193,8 @@ trait AuthorizationFlowTrait {
         $tokenResponse);
     }
 
-    // Ensure a custom scope is returned
-    if(!isset($response['scope'])) {
-      return $this->_respondWithError($this->baseRoute,
-        'No scopes were found in the response. Ensure you\'ve requested at least one of your custom scopes for this request.',
-        $tokenResponse);
-    }
-
     if($provider != 'auth0') {
-      $scopesReturned = explode(' ', $response['scope']);
+      $scopesReturned = !empty($response['scope']) ? explode(' ', $response['scope']) : [];
       if(!is_array($scopesReturned) || !count($scopesReturned) || !count(array_intersect($scopes, $scopesReturned))) {
         return $this->_respondWithError($this->baseRoute,
           'Make sure you\'ve requested one of the scopes you made public. You can find the list of scopes we\'re looking for in the first exercise.',
