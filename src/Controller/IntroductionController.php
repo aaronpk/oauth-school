@@ -51,12 +51,12 @@ class IntroductionController extends ExerciseController {
     $provider = $this->_providerFromIssuer($issuer);
 
     // First fetch the OAuth server metadata
-    $metadataURL = $issuer.'/.well-known/oauth-authorization-server';
+    $metadataURL = trim($issuer,'/').'/.well-known/oauth-authorization-server';
     list($metadata, $error) = $this->_fetchMetadataURL($metadataURL, $provider);
 
     if($error) {
       // Try fetching the OpenID Configuration next
-      $metadataURL = $issuer.'/.well-known/openid-configuration';
+      $metadataURL = trim($issuer,'/').'/.well-known/openid-configuration';
       list($metadata, $error) = $this->_fetchMetadataURL($metadataURL, $provider);
 
       if($error) {
