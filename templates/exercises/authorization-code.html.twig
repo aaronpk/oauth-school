@@ -128,7 +128,7 @@
 
         <p>If you’re using curl, you can start with the example command below and replace the values with your own. (Make sure to replace the curly brackets, those are just to indicate placeholder values.)</p>
 
-        <textarea class="form-control code" rows="8">curl -X POST {{ app.session.get('token_endpoint') }} \
+        <textarea class="form-control code" rows="8">curl -X POST {{ app.session.get('token_endpoint') ?? 'https://xxxxxx.us.auth0.com/oauth/token' }} \
   -d grant_type=authorization_code \
   -d redirect_uri=https://example-app.com/redirect \
   -d client_id={YOUR_CLIENT_ID} \ {{ confidential_client ? "\n  -d client_secret={YOUR_CLIENT_SECRET} \\" : "" }}
