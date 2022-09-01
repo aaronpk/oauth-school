@@ -14,6 +14,7 @@ class WebFlowController extends ExerciseController {
 
   protected $pageTitle = 'Authorization Code Flow for Web Apps';
   protected $baseRoute = 'web';
+  protected $confidentialClient = true;
 
   public function save(Request $request): Response {
 

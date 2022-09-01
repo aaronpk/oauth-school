@@ -37,21 +37,17 @@
 
       {% if app.session.flashbag.has('authorizationURLSuccess') == false %}
 
-      <p>The goal of this exercise is to get an access token using the authorization code flow and PKCE. This exercise will walk you through the flow manually without writing any code. You are of course free to write code to do this instead if you’d like, but the instructions here will show you the step by step process of what’s happening under the hood.</p>
+      <p>The goal of this exercise is to get an access token using the authorization code flow and PKCE as a {{ confidential_client ? 'confidential client' : 'public client' }}. This exercise will walk you through the flow manually without writing any code. You are of course free to write code to do this instead if you’d like, but the instructions here will show you the step by step process of what’s happening under the hood.</p>
 
       <p>From the side menu of your Auth0 dashboard, click on <b>Applications</b> and choose <b>Applications</b>.</p>
 
       <img class="small" src="/images/authorization-code/image2.png">
 
-      <p>Click <b>Create App Integration</b>, then in the popup dialog, give it a name and choose <b>Regular Web Applications</b> as the application type.</p>
+      <p>Click <b>Create App Integration</b>, then in the popup dialog, give it a name and choose <b>{{ confidential_client ? 'Regular Web Applications' : 'Single Page Web Applications' }}</b> as the application type.</p>
 
-      <img class="small" src="/images/authorization-code/image4.png">
+      <img class="small" src="/images/authorization-code/{{ confidential_client ? 'image4.png' : 'image6.png' }}">
 
       <p>After creating the app, click <b>Settings</b> so that we can add a Sign-in redirect URL. This is where the OAuth server will send the user back to after they log in. For this exercise, we’ll use a placeholder URL that will help us out.</p>
-
-      <p>Under Allowed Callback URLs, add https://example-app.com/redirect as the redirect URI for your application.</p>
-
-      <p>After creating the app, click Settings so that we can add a Sign-in redirect URL. This is where the OAuth server will send the user back to after they log in. For this exercise, we’ll use a placeholder URL that will help us out.</p>
 
       <p>Under Allowed Callback URLs, add <code>https://example-app.com/redirect</code> as the redirect URI for your application.</p>
 
@@ -59,11 +55,11 @@
 
       <p>You can leave all the other values empty or with their default values. Scroll to the bottom and click <b>Save Changes</b>.</p>
 
-      <p>Back at the top of the Settings screen you’ll see the application’s client ID and secret. You’ll need these to complete the OAuth flow.</p>
+      <p>Back at the top of the Settings screen you’ll see the application’s client ID{{ confidential_client ? ' and secret' : '' }} needed to complete the OAuth flow.</p>
 
-      <img class="small" src="/images/authorization-code/image1.png">
+      <img class="small" src="/images/authorization-code/{{ confidential_client ? 'image1.png' : 'image7.png' }}">
 
-      <p>With your application credentials in hand, you’re ready to start the flow! To do that, you’ll need to use the authorization server’s authorization endpoint that you found in the Getting Started exercise. Look up the URL from your notes or copy it from the <a href="/exercise/introduction/">Introduction exercise</a>.</p>
+      <p>With your {{ confidential_client ? 'application credentials' : 'client ID' }} in hand, you’re ready to start the flow! To do that, you’ll need to use the authorization server’s authorization endpoint that you found in the Getting Started exercise. Look up the URL from your notes or copy it from the <a href="/exercise/introduction/">Introduction exercise</a>.</p>
 
       <p>Before you can create the complete authorization URL, you need to create the PKCE Code Verifier. Generate a random string between 43-128 characters long. You can do this on your own, or use the button below to generate one.</p>
 
@@ -135,8 +131,7 @@
         <textarea class="form-control code" rows="8">curl -X POST {{ app.session.get('token_endpoint') }} \
   -d grant_type=authorization_code \
   -d redirect_uri=https://example-app.com/redirect \
-  -d client_id={YOUR_CLIENT_ID} \
-  -d client_secret={YOUR_CLIENT_SECRET} \
+  -d client_id={YOUR_CLIENT_ID} \ {{ confidential_client ? "\n  -d client_secret={YOUR_CLIENT_SECRET} \\" : "" }}
   -d code_verifier={YOUR_CODE_VERIFIER} \
   -d code={YOUR_AUTHORIZATION_CODE}</textarea>
 

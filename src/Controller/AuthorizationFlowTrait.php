@@ -20,6 +20,7 @@ trait AuthorizationFlowTrait {
       'issuer' => $issuer,
       'scopes' => $scopes,
       'base_route' => $this->baseRoute,
+      'confidential_client' => $this->confidentialClient,
     ]);
   }
 
