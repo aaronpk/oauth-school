@@ -4,7 +4,7 @@
 
 {% block body %}
 
-<div class="container">
+<div class="container guide">
   <div class="row">
     <div class="col-md-10 ml-md-auto">
 
@@ -15,8 +15,6 @@
           <i class="fas fa-check-circle"></i> You have completed this exercise!
         </div>
       {% endif %}
-
-      <p>Use the Authorization Code flow with PKCE, and paste the entire response from the token endpoint in the box to check your work. (Note: only do this for accounts you've created specifically for this course, never paste access tokens from production systems in random websites!)</p>
 
       {% if app.session.get('complete_introduction') == false %}
         <div class="alert alert-warning" role="alert">
@@ -37,13 +35,83 @@
         </div>
       {% endfor %}
 
+      {% if app.session.flashbag.has('authorizationURLSuccess') == false %}
+
+      <p>The goal of this exercise is to get an access token using the authorization code flow and PKCE. This exercise will walk you through the flow manually without writing any code. You are of course free to write code to do this instead if you’d like, but the instructions here will show you the step by step process of what’s happening under the hood.</p>
+
+      <p>From the side menu of your Auth0 dashboard, click on <b>Applications</b> and choose <b>Applications</b>.</p>
+
+      <img class="small" src="/images/authorization-code/image2.png">
+
+      <p>Click <b>Create App Integration</b>, then in the popup dialog, give it a name and choose <b>Regular Web Applications</b> as the application type.</p>
+
+      <img class="small" src="/images/authorization-code/image4.png">
+
+      <p>After creating the app, click <b>Settings</b> so that we can add a Sign-in redirect URL. This is where the OAuth server will send the user back to after they log in. For this exercise, we’ll use a placeholder URL that will help us out.</p>
+
+      <p>Under Allowed Callback URLs, add https://example-app.com/redirect as the redirect URI for your application.</p>
+
+      <p>After creating the app, click Settings so that we can add a Sign-in redirect URL. This is where the OAuth server will send the user back to after they log in. For this exercise, we’ll use a placeholder URL that will help us out.</p>
+
+      <p>Under Allowed Callback URLs, add <code>https://example-app.com/redirect</code> as the redirect URI for your application.</p>
+
+      <img class="small" src="/images/authorization-code/image3.png">
+
+      <p>You can leave all the other values empty or with their default values. Scroll to the bottom and click <b>Save Changes</b>.</p>
+
+      <p>Back at the top of the Settings screen you’ll see the application’s client ID and secret. You’ll need these to complete the OAuth flow.</p>
+
+      <img class="small" src="/images/authorization-code/image1.png">
+
+      <p>With your application credentials in hand, you’re ready to start the flow! To do that, you’ll need to use the authorization server’s authorization endpoint that you found in the Getting Started exercise. Look up the URL from your notes or copy it from the <a href="/exercise/introduction/">Introduction exercise</a>.</p>
+
+      <p>Before you can create the complete authorization URL, you need to create the PKCE Code Verifier. Generate a random string between 43-128 characters long. You can do this on your own, or use the button below to generate one.</p>
+
+      <p><button id="pkce-generate-random-string" class="btn btn-secondary">Generate Random String</button></p>
+      <div class="input-group" style="margin-bottom: 12px;">
+        <span class="input-group-text">Code Verifier</span>
+        <input class="code form-control" id="pkce-plaintext" placeholder="plaintext random string">
+      </div>
+
+      <p>Save the Code Verifier and keep it secret, you won’t need that until the end.</p>
+
+      <p>Next, you need to create the <b>Code Challenge</b>, which is the Base64-URL-encoded SHA256 hash of the random string you generated. You can write code to do this yourself, or you can paste your random string into the field above, and click the <b>Calculate Hash</b> button below.</p>
+
+      <p><button id="pkce-calculate-sha256" class="btn btn-secondary">Calculate Hash</button></p>
+      <div class="input-group" style="margin-bottom: 12px;">
+        <span class="input-group-text">Code Challenge</span>
+        <input class="code form-control" id="pkce-sha256" placeholder="base64-url-encoded SHA256 hash of the code verifier">
+      </div>
+
+      <p>You are ready to build the URL to send the user to go log in. You’ll start with the authorization endpoint, and add the appropriate query string parameters describing your request.</p>
+
+      <p>Fill in the placeholder values with your own values. (Make sure to replace the curly brackets, those are just to indicate placeholder values.)</p>
+
+      {% endif %}
+
       <h2>Authorization Request</h2>
+
+      {% if app.session.flashbag.has('authorizationURLSuccess') %}
+
+        <p>Click the <b>Log In</b> link below to be redirected to your authorization server.</p>
+
+        <p>You should be prompted to log in with your Auth0 user account. Note that your developer account is not a user in your Auth0 tenant, so you'll need to either make a new account or use the Google social auth button to log in. Once you log in, you’ll be redirected back to the example-app.com redirect URL. Look up in the query string to see if you got back an authorization code or if there is an error. If there is an error, the message will help you figure out what is wrong. It could be that you included a scope that doesn’t exist, or the <code>client_id</code> is wrong.</p>
+
+      {% endif %}
+
       <div class="card bg-light mb-3 mt-3 {{ app.session.get('complete_introduction') ? '' : 'disabled' }}">
         <div class="card-body">
 
           <form method="post" action="{{ path(base_route ~ '/authz') }}">
             <div class="mb-3">
-              <textarea class="form-control" name="authorizationURL" aria-describedby="authorizationURLHelp" rows="4" placeholder="https://dev-XXXXXX.okta.com/oauth..." {{ app.session.flashbag.has('loginURL') ? 'readonly' }}>{{ app.session.flashbag.has('authorizationURL') ? app.session.flashbag.get('authorizationURL')[0] : '' }}</textarea>
+              <textarea class="form-control code" name="authorizationURL" id="authorizationURL" aria-describedby="authorizationURLHelp" rows="8" placeholder="https://xxxxxx.us.auth0.com/authorize?
+  response_type=code&
+  client_id={YOUR_CLIENT_ID}&
+  state={RANDOM_STRING}&
+  redirect_uri=https://example-app.com/redirect&
+  code_challenge={YOUR_CODE_CHALLENGE}&
+  code_challenge_method=S256
+" {{ app.session.flashbag.has('loginURL') ? 'readonly' }}>{{ app.session.flashbag.has('authorizationURL') ? app.session.flashbag.get('authorizationURL')[0] : '' }}</textarea>
               <div id="authorizationURLHelp" class="form-text">Create the initial URL for the authorization request and paste it above. Once it's correct, a "Log In" button with that URL will appear below</div>
             </div>
             {% if app.session.flashbag.has('loginURL') %}
@@ -57,6 +125,26 @@
         </div>
       </div>
 
+      {% if app.session.flashbag.has('authorizationURLSuccess') %}
+        <p>If you got back an authorization code in the redirect, you’re ready to exchange that for an access token!</p>
+
+        <p>Now you’ll need to make a POST request to the token endpoint to exchange that temporary authorization code for an access token. You can do this manually with curl or Postman, or you can write code for it as well. You’ll need the complete response from this request in order to check your work.</p>
+
+        <p>If you’re using curl, you can start with the example command below and replace the values with your own. (Make sure to replace the curly brackets, those are just to indicate placeholder values.)</p>
+
+        <textarea class="form-control code" rows="8">curl -X POST {{ app.session.get('token_endpoint') }} \
+  -d grant_type=authorization_code \
+  -d redirect_uri=https://example-app.com/redirect \
+  -d client_id={YOUR_CLIENT_ID} \
+  -d client_secret={YOUR_CLIENT_SECRET} \
+  -d code_verifier={YOUR_CODE_VERIFIER} \
+  -d code={YOUR_AUTHORIZATION_CODE}</textarea>
+
+        <p>If everything worked, you’ll get a response that includes an access token! The most likely way this will fail is if you took too long between getting the authorization code and making this request. These codes last for a short amount of time, so you’ll want to get everything ready to make this POST request as soon as you can after getting the authorization code. The second most common thing that could cause an error is mixing up the code verifier and code challenge, or using the wrong encoding in the code challenge in the first step.</p>
+
+        <p>Paste the entire response (not just the access token) below to check your work! If everything worked, you’ll get a message saying you’ve finished!</p>
+
+      {% endif %}
 
       <h2>Token Response</h2>
       <div class="card bg-light mb-3 mt-3 {{ app.session.get('complete_introduction') ? '' : 'disabled' }}">
@@ -64,7 +152,7 @@
 
           <form method="post" action="{{ path(base_route ~ '/save') }}">
             <div class="mb-3">
-              <textarea class="form-control" name="tokenResponse" aria-describedby="tokenHelp" rows="8" placeholder="{&#13;  &quot;token_type&quot;: &quot;Bearer&quot;,&#13;  ...&#13;}"></textarea>
+              <textarea class="form-control code" name="tokenResponse" aria-describedby="tokenHelp" rows="8" placeholder="{&#13;  &quot;token_type&quot;: &quot;Bearer&quot;,&#13;  ...&#13;}"></textarea>
               <div id="tokenHelp" class="form-text">Use the authorization code flow to get an access token, then paste the entire token response JSON here to check your work</div>
             </div>
             <button type="submit" class="btn btn-primary">Check Your Response</button>
@@ -77,4 +165,18 @@
   </div>
 </div>
 
+{% if app.session.flashbag.get('authorizationURLSuccess') %}
+{% endif %}
+
+{% endblock %}
+
+
+{% block javascripts %}
+<script>
+  $("#authorizationURL").click(function(){
+    if($(this).val() == "") {
+      $(this).val($(this).attr("placeholder").replace("https://xxxxxx.us.auth0.com/authorize", "{{ app.session.get('authorization_endpoint') }}"));
+    }
+  });
+</script>
 {% endblock %}

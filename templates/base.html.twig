@@ -41,7 +41,9 @@
   {% block body %}{% endblock %}
 
   <script src="/bootstrap-5.0.0-beta1-dist/js/bootstrap.min.js"></script>
+  <script src="/scripts/jquery.js"></script>
   {% block javascripts %}{% endblock %}
+  <script src="/scripts/pkce.js"></script>
   {% if fathom_src %}
     <script src="{{ fathom_src }}" data-site="{{ fathom_site }}" defer></script>
   {% endif %}

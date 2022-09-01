@@ -132,6 +132,8 @@ trait AuthorizationFlowTrait {
       return $addl;
     }
 
+    $this->addFlash('authorizationURLSuccess', true);
+
     // Everything checked out, log a success
     return $this->_respondWithSuccess(
       $redirectToRoute,
