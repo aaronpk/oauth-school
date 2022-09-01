@@ -79,6 +79,7 @@ trait AuthorizationFlowTrait {
     parse_str($url['query'], $query);
 
     $required = ['response_type', 'client_id', 'state', 'redirect_uri', 'code_challenge', 'code_challenge_method'];
+    $optional = ['scope'];
 
     $missing = false;
     $invalid = false;
@@ -102,7 +103,7 @@ trait AuthorizationFlowTrait {
         $authorizationURL);
     }
 
-    $diff = array_diff(array_keys($query), $required);
+    $diff = array_diff(array_keys($query), array_merge($required,$optional));
 
     if(count($diff)) {
       return $this->_respondWithError($redirectToRoute,
