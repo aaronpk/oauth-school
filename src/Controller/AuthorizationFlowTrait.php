@@ -10,7 +10,12 @@ use ORM;
 
 trait AuthorizationFlowTrait {
 
-  public function index(): Response {
+  public function index(Request $request): Response {
+
+    if($request->query->get('reset')) {
+      $this->session->remove('authorizationURLSuccess');
+      $this->session->remove('authorizationURL');
+    }
 
     $issuer = $this->session->get('issuer');
     $scopes = $this->session->get('scopes');
@@ -31,6 +36,8 @@ trait AuthorizationFlowTrait {
 
     $scopes = $this->session->get('scopes');
 
+    $this->session->set('authorizationURLSuccess', false);
+
     $authorizationURL = trim($request->request->get('authorizationURL'));
 
     if(!$authorizationURL) {
@@ -41,7 +48,7 @@ trait AuthorizationFlowTrait {
 
     $authorizationURL = preg_replace('/[\s]+/', '', $authorizationURL);
 
-    $this->addFlash('authorizationURL', $authorizationURL);
+    $this->session->set('authorizationURL', $authorizationURL);
 
     $url = parse_url($authorizationURL);
 
@@ -133,7 +140,8 @@ trait AuthorizationFlowTrait {
       return $addl;
     }
 
-    $this->addFlash('authorizationURLSuccess', true);
+    $this->session->set('authorizationURLSuccess', true);
+    $this->session->remove('authorizationURL');
 
     // Everything checked out, log a success
     return $this->_respondWithSuccess(
@@ -258,6 +266,7 @@ trait AuthorizationFlowTrait {
     }
 
     $this->_updateEmailForIssuer($claims['sub']);
+    $this->session->set('authorizationURLSuccess', false);
 
     return null;
   }

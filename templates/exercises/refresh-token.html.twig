@@ -4,7 +4,7 @@
 
 {% block body %}
 
-<div class="container">
+<div class="container guide">
   <div class="row">
     <div class="col-md-10 ml-md-auto">
 
@@ -15,8 +15,6 @@
           <i class="fas fa-check-circle"></i> You have completed this exercise!
         </div>
       {% endif %}
-
-      <p>Use the Authorization Code flow with PKCE to get an access token, and paste the entire response from the token endpoint in the box to check your work. Then, use the refresh token to get a new access token. (Note: only do this for accounts you've created specifically for this course, never paste access tokens from production systems in random websites like this!)</p>
 
       {% if app.session.get('complete_introduction') == false %}
         <div class="alert alert-warning" role="alert">
@@ -37,43 +35,118 @@
         </div>
       {% endfor %}
 
-      {% if(app.session.get('refresh_token_response_1') == null) %}
+      {% if app.session.get('authorizationURLSuccess') == false %}
 
-      <h2>Authorization Request</h2>
-      <div class="card bg-light mb-3 mt-3 {{ app.session.get('complete_introduction') ? '' : 'disabled' }}">
-        <div class="card-body">
+        <p>In this exercise you’ll learn how to obtain a refresh token and use it to get new access tokens.</p>
 
-          <form method="post" action="{{ path(base_route ~ '/authz') }}">
-            <div class="mb-3">
-              <textarea class="form-control" name="authorizationURL" aria-describedby="authorizationURLHelp" rows="4" placeholder="https://dev-XXXXXX.okta.com/oauth..." {{ app.session.flashbag.has('loginURL') ? 'readonly' }}>{{ app.session.flashbag.has('authorizationURL') ? app.session.flashbag.get('authorizationURL')[0] : '' }}</textarea>
-              <div id="authorizationURLHelp" class="form-text">Create the initial URL for the authorization request and paste it above. Once it's correct, a "Log In" button with that URL will appear below</div>
-            </div>
-            {% if app.session.flashbag.has('loginURL') %}
-              <a href="{{ app.session.flashbag.get('loginURL')[0] }}" class="btn btn-primary" target="_blank">Log In</a>
-              <a href="" class="btn">Reset</a>
-            {% else %}
-              <button type="submit" class="btn btn-primary">Check Your URL</button>
-            {% endif %}
-          </form>
+        <p>The goal of this exercise is to get a refresh token and use the refresh token to get a new access token. We will be building on the previous exercise where you used the authorization code flow to get an access token.</p>
 
+        <p>You should already have created an application and completed the <a href="/exercise/web/">OAuth for Web Applications</a> exercise before attempting this exercise.</p>
+
+        <p>Before the application is able to request a refresh token, you need to enable refresh tokens for this API. From the sidebar, navigate to <b>Applications</b> and click <b>APIs</b>. Find the API you created earlier, and enable the <b>Allow Offline Access</b> toggle.</p>
+
+        <img class="small" src="/images/refresh-tokens/image7.png">
+
+        <p>Once this is enabled, applications will be able to request refresh tokens for this API.</p>
+
+        <p>Now you’re ready to start a new OAuth flow and request a refresh token. Build the authorization URL like you did before, but this time add the scope <code>offline_access</code> to the request.</p>
+
+        <p><button id="pkce-generate-random-string" class="btn btn-secondary">Generate Random String</button></p>
+        <div class="input-group" style="margin-bottom: 12px;">
+          <span class="input-group-text">Code Verifier</span>
+          <input class="code form-control" id="pkce-plaintext" placeholder="plaintext random string">
         </div>
-      </div>
 
+        <p>Save the Code Verifier and keep it secret, you won’t need that until the end.</p>
 
-      <h2>Token Response</h2>
-      <div class="card bg-light mb-3 mt-3 {{ app.session.get('complete_introduction') ? '' : 'disabled' }}">
-        <div class="card-body">
+        <p>Next, you need to create the <b>Code Challenge</b>, which is the Base64-URL-encoded SHA256 hash of the random string you generated. You can write code to do this yourself, or you can paste your random string into the field above, and click the <b>Calculate Hash</b> button below.</p>
 
-          <form method="post" action="{{ path(base_route ~ '/save') }}">
-            <div class="mb-3">
-              <textarea class="form-control" name="tokenResponse" aria-describedby="tokenHelp" rows="8" placeholder="{&#13;  &quot;token_type&quot;: &quot;Bearer&quot;,&#13;  ...&#13;}"></textarea>
-              <div id="tokenHelp" class="form-text">Use the authorization code flow to get an access token, then paste the entire token response JSON here to check your work</div>
-            </div>
-            <button type="submit" class="btn btn-primary">Check Your Response</button>
-          </form>
-
+        <p><button id="pkce-calculate-sha256" class="btn btn-secondary">Calculate Hash</button></p>
+        <div class="input-group" style="margin-bottom: 12px;">
+          <span class="input-group-text">Code Challenge</span>
+          <input class="code form-control" id="pkce-sha256" placeholder="base64-url-encoded SHA256 hash of the code verifier">
         </div>
-      </div>
+
+      {% endif %}
+
+      {% if app.session.get('refresh_token_response_1') == null %}
+
+        <h2>Authorization Request</h2>
+        <div class="card bg-light mb-3 mt-3 {{ app.session.get('complete_introduction') ? '' : 'disabled' }}">
+          <div class="card-body">
+
+            <form method="post" action="{{ path(base_route ~ '/authz') }}">
+              <div class="mb-3">
+                <textarea class="form-control code" name="authorizationURL" id="authorizationURL" aria-describedby="authorizationURLHelp" rows="8" placeholder="https://xxxxxx.us.auth0.com/authorize?
+    response_type=code&
+    client_id={YOUR_CLIENT_ID}&
+    state={RANDOM_STRING}&
+    scope=offline_access&
+    redirect_uri=https://example-app.com/redirect&
+    code_challenge={YOUR_CODE_CHALLENGE}&
+    code_challenge_method=S256
+  " {{ app.session.flashbag.has('loginURL') ? 'readonly' }}>{{ app.session.get('authorizationURL') ?: '' }}</textarea>
+                <div id="authorizationURLHelp" class="form-text">Create the initial URL for the authorization request and paste it above. Once it's correct, a "Log In" button with that URL will appear below</div>
+              </div>
+              {% if app.session.flashbag.has('loginURL') %}
+                <a href="{{ app.session.flashbag.get('loginURL')[0] }}" class="btn btn-primary" target="_blank">Log In</a>
+                <a href="?reset=1" class="btn">Reset</a>
+              {% else %}
+                <button type="submit" class="btn btn-primary">Check Your URL</button>
+              {% endif %}
+            </form>
+
+          </div>
+        </div>
+
+        {% if app.session.get('authorizationURLSuccess') %}
+          <p>If you got back an authorization code in the redirect, you’re ready to exchange that for an access token and refresh token!</p>
+
+          <p>Now you’ll need to make a POST request to the token endpoint to exchange that temporary authorization code for the two tokens. You can do this manually with curl or Postman, or you can write code for it as well. You’ll need the complete response from this request in order to check your work.</p>
+
+          <p>If you’re using curl, you can start with the example command below and replace the values with your own. (Make sure to replace the curly brackets, those are just to indicate placeholder values.)</p>
+
+          <textarea class="form-control code" rows="8">curl -X POST {{ app.session.get('token_endpoint') ?? 'https://xxxxxx.us.auth0.com/oauth/token' }} \
+  -d grant_type=authorization_code \
+  -d redirect_uri=https://example-app.com/redirect \
+  -d client_id={YOUR_CLIENT_ID} \ {{ confidential_client ? "\n  -d client_secret={YOUR_CLIENT_SECRET} \\" : "" }}
+  -d code_verifier={YOUR_CODE_VERIFIER} \
+  -d code={YOUR_AUTHORIZATION_CODE}</textarea>
+
+          <p>If everything worked, you’ll get a response that includes an access token and refresh token!</p>
+
+          <p>Paste the entire response (not just the access token) below to check your work.</p>
+
+        {% endif %}
+
+
+        <h2>Token Response</h2>
+        <div class="card bg-light mb-3 mt-3 {{ app.session.get('complete_introduction') ? '' : 'disabled' }}">
+          <div class="card-body">
+
+            <form method="post" action="{{ path(base_route ~ '/save') }}">
+              <div class="mb-3">
+                <textarea class="form-control" name="tokenResponse" aria-describedby="tokenHelp" rows="8" placeholder="{&#13;  &quot;token_type&quot;: &quot;Bearer&quot;,&#13;  ...&#13;}"></textarea>
+                <div id="tokenHelp" class="form-text">Use the authorization code flow to get an access token, then paste the entire token response JSON here to check your work</div>
+              </div>
+              <button type="submit" class="btn btn-primary">Check Your Response</button>
+            </form>
+
+          </div>
+        </div>
+
+      {% else %}
+
+        <p>Make a POST request to the token endpoint again, but this time you’ll use new parameters to make the refresh token request.</p>
+
+          <textarea class="form-control code" rows="5">curl -X POST {{ app.session.get('token_endpoint') ?? 'https://xxxxxx.us.auth0.com/oauth/token' }} \
+  -d grant_type=refresh_token \
+  -d client_id={YOUR_CLIENT_ID} \ {{ confidential_client ? "\n  -d client_secret={YOUR_CLIENT_SECRET} \\" : "" }}
+  -d refresh_token={REFRESH_TOKEN}</textarea>
+
+        <p>You should get back a new access token response, which will look similar to the previous response except this will include a new access token. Paste the entire response into the field below to check the result!</p>
+
+        <p>For extra credit, enable the Refresh Token Rotation setting on the application and see how this changes the behavior!</p>
 
       {% endif %}
 

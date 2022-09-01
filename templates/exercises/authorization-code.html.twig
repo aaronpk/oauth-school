@@ -35,7 +35,7 @@
         </div>
       {% endfor %}
 
-      {% if app.session.flashbag.has('authorizationURLSuccess') == false %}
+      {% if app.session.get('authorizationURLSuccess') == false %}
 
       <p>The goal of this exercise is to get an access token using the authorization code flow and PKCE as a {{ confidential_client ? 'confidential client' : 'public client' }}. This exercise will walk you through the flow manually without writing any code. You are of course free to write code to do this instead if you’d like, but the instructions here will show you the step by step process of what’s happening under the hood.</p>
 
@@ -87,7 +87,7 @@
 
       <h2>Authorization Request</h2>
 
-      {% if app.session.flashbag.has('authorizationURLSuccess') %}
+      {% if app.session.get('authorizationURLSuccess') %}
 
         <p>Click the <b>Log In</b> link below to be redirected to your authorization server.</p>
 
@@ -107,12 +107,12 @@
   redirect_uri=https://example-app.com/redirect&
   code_challenge={YOUR_CODE_CHALLENGE}&
   code_challenge_method=S256
-" {{ app.session.flashbag.has('loginURL') ? 'readonly' }}>{{ app.session.flashbag.has('authorizationURL') ? app.session.flashbag.get('authorizationURL')[0] : '' }}</textarea>
+" {{ app.session.flashbag.has('loginURL') ? 'readonly' }}>{{ app.session.get('authorizationURL') ?: '' }}</textarea>
               <div id="authorizationURLHelp" class="form-text">Create the initial URL for the authorization request and paste it above. Once it's correct, a "Log In" button with that URL will appear below</div>
             </div>
             {% if app.session.flashbag.has('loginURL') %}
               <a href="{{ app.session.flashbag.get('loginURL')[0] }}" class="btn btn-primary" target="_blank">Log In</a>
-              <a href="" class="btn">Reset</a>
+              <a href="?reset=1" class="btn">Reset</a>
             {% else %}
               <button type="submit" class="btn btn-primary">Check Your URL</button>
             {% endif %}
@@ -121,7 +121,7 @@
         </div>
       </div>
 
-      {% if app.session.flashbag.has('authorizationURLSuccess') %}
+      {% if app.session.get('authorizationURLSuccess') %}
         <p>If you got back an authorization code in the redirect, you’re ready to exchange that for an access token!</p>
 
         <p>Now you’ll need to make a POST request to the token endpoint to exchange that temporary authorization code for an access token. You can do this manually with curl or Postman, or you can write code for it as well. You’ll need the complete response from this request in order to check your work.</p>
@@ -160,18 +160,5 @@
   </div>
 </div>
 
-{% if app.session.flashbag.get('authorizationURLSuccess') %}
-{% endif %}
-
 {% endblock %}
 
-
-{% block javascripts %}
-<script>
-  $("#authorizationURL").click(function(){
-    if($(this).val() == "") {
-      $(this).val($(this).attr("placeholder").replace("https://xxxxxx.us.auth0.com/authorize", "{{ app.session.get('authorization_endpoint') }}"));
-    }
-  });
-</script>
-{% endblock %}

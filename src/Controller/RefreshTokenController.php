@@ -19,6 +19,8 @@ class RefreshTokenController extends ExerciseController {
 
     if($request->query->get('reset')) {
       $this->session->remove('refresh_token_response_1');
+      $this->session->remove('authorizationURLSuccess');
+      $this->session->remove('authorizationURL');
     }
 
     $issuer = $this->session->get('issuer');
@@ -29,6 +31,7 @@ class RefreshTokenController extends ExerciseController {
       'issuer' => $issuer,
       'scopes' => $scopes,
       'base_route' => $this->baseRoute,
+      'confidential_client' => true,
     ]);
   }
 
@@ -58,11 +61,12 @@ class RefreshTokenController extends ExerciseController {
 
     if(!isset($response['refresh_token'])) {
       return $this->_respondWithError($redirectToRoute,
-        'The response from the token endpoint did not contain a refresh token. Double check that you\'ve enabled the Refresh Token grant for this client in the application\'s settings, and make sure you request a token with the offline_access scope.',
+        'The response from the token endpoint did not contain a refresh token. Double check that you\'ve enabled Offline Access for the API, and make sure you include the offline_access scope in the authorization request.',
         $this->tokenResponse);
     }
 
     $this->session->set('refresh_token_response_1', $this->tokenString);
+    $this->session->set('authorizationURLSuccess', true);
 
     // Everything checked out, log a success for this step and continue
     return $this->_respondWithSuccess(
@@ -80,6 +84,8 @@ class RefreshTokenController extends ExerciseController {
       return $errorResponse;
     }
 
+    $this->session->set('authorizationURLSuccess', true);
+
     // Check that the access token in this response is not the same as the previous one
     $previousAccessToken = $this->session->get('refresh_token_response_1');
 
@@ -91,6 +97,8 @@ class RefreshTokenController extends ExerciseController {
 
     $this->session->remove('refresh_token_response_1');
     $this->session->set('complete_refresh', true);
+    $this->session->remove('authorizationURLSuccess');
+    $this->session->remove('authorizationURL');
 
     return $this->_respondWithSuccess(
       $this->baseRoute,
