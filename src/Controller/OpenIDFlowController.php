@@ -21,7 +21,10 @@ class OpenIDFlowController extends ExerciseController {
   public function index(Request $request): Response {
 
     if($request->query->get('reset')) {
+      $this->session->remove('authorizationURLSuccess');
+      $this->session->remove('authorizationURL');
       $this->session->remove('openid_claims');
+      $this->session->remove('openid_idtoken');
     }
 
     $issuer = $this->session->get('issuer');
@@ -33,6 +36,7 @@ class OpenIDFlowController extends ExerciseController {
       'scopes' => $scopes,
       'base_route' => $this->baseRoute,
       'id_token' => $this->session->get('openid_idtoken'),
+      'confidential_client' => true,
     ]);
   }
 

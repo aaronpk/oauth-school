@@ -141,7 +141,7 @@ trait AuthorizationFlowTrait {
     }
 
     $this->session->set('authorizationURLSuccess', true);
-    $this->session->remove('authorizationURL');
+    #$this->session->remove('authorizationURL');
 
     // Everything checked out, log a success
     return $this->_respondWithSuccess(
@@ -266,7 +266,8 @@ trait AuthorizationFlowTrait {
     }
 
     $this->_updateEmailForIssuer($claims['sub']);
-    $this->session->set('authorizationURLSuccess', false);
+    $this->session->remove('authorizationURLSuccess');
+    $this->session->remove('authorizationURL');
 
     return null;
   }

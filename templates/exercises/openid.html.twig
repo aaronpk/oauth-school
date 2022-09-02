@@ -42,42 +42,94 @@
 
       {% if(app.session.get('openid_claims') == null) %}
 
-      <p>Use the Authorization Code flow with PKCE, and paste the entire response from the token endpoint in the box to check your work. (Note: only do this for accounts you've created specifically for this course, never paste access tokens from production systems in random websites like this!)</p>
+        {% if app.session.get('authorizationURLSuccess') == null %}
 
-      <h2>Authorization Request</h2>
-      <div class="card bg-light mb-3 mt-3 {{ app.session.get('complete_introduction') ? '' : 'disabled' }}">
-        <div class="card-body">
+          <p>In this exercise you’ll learn how to request an OpenID Connect ID token and extract the user’s information from it.</p>
 
-          <form method="post" action="{{ path(base_route ~ '/authz') }}">
-            <div class="mb-3">
-              <textarea class="form-control" name="authorizationURL" aria-describedby="authorizationURLHelp" rows="4" placeholder="https://dev-XXXXXX.okta.com/oauth..." {{ app.session.flashbag.has('loginURL') ? 'readonly' }}>{{ app.session.flashbag.has('authorizationURL') ? app.session.flashbag.get('authorizationURL')[0] : '' }}</textarea>
-              <div id="authorizationURLHelp" class="form-text">Create the initial URL for the authorization request and paste it above. Once it's correct, a "Log In" button with that URL will appear below</div>
-            </div>
-            {% if app.session.flashbag.has('loginURL') %}
-              <a href="{{ app.session.flashbag.get('loginURL')[0] }}" class="btn btn-primary" target="_blank">Log In</a>
-              <a href="" class="btn">Reset</a>
-            {% else %}
-              <button type="submit" class="btn btn-primary">Check Your URL</button>
-            {% endif %}
-          </form>
+          <p>The goal of this exercise is to get an ID token and to extract the user’s profile information from the ID token. We will be building on the previous exercise where you used the authorization code flow to get an access token. Rather than repeat all the setup steps here, we’ll assume you have already created an application and have gone through the authorization code flow at least once.</p>
 
+          <p>To get an ID token, you need to add the <code>openid</code> scope to the authorization request. You can also add the <code>profile</code> and <code>email</code> scopes to get more information about the user. Build the authorization URL including those three scopes.</p>
+
+          <p><button id="pkce-generate-random-string" class="btn btn-secondary">Generate Random String</button></p>
+          <div class="input-group" style="margin-bottom: 12px;">
+            <span class="input-group-text">Code Verifier</span>
+            <input class="code form-control" id="pkce-plaintext" placeholder="plaintext random string">
+          </div>
+
+          <p>Save the Code Verifier and keep it secret, you won’t need that until the end.</p>
+
+          <p><button id="pkce-calculate-sha256" class="btn btn-secondary">Calculate Hash</button></p>
+          <div class="input-group" style="margin-bottom: 12px;">
+            <span class="input-group-text">Code Challenge</span>
+            <input class="code form-control" id="pkce-sha256" placeholder="base64-url-encoded SHA256 hash of the code verifier">
+          </div>
+
+          <p>Fill in the placeholder values with your own values. (Make sure to replace the curly brackets, those are just to indicate placeholder values.)</p>
+
+        {% endif %}
+
+
+        <h2>Authorization Request</h2>
+
+        <p>Note that we are still using the authorization code flow with PKCE when getting the ID token so that we get it over the back channel, simplifying the process by avoiding the need to verify the ID token signature.</p>
+
+
+        <div class="card bg-light mb-3 mt-3 {{ app.session.get('complete_introduction') ? '' : 'disabled' }}">
+          <div class="card-body">
+
+            <form method="post" action="{{ path(base_route ~ '/authz') }}">
+              <div class="mb-3">
+                <textarea class="form-control code" name="authorizationURL" id="authorizationURL" aria-describedby="authorizationURLHelp" rows="8" placeholder="https://xxxxxx.us.auth0.com/authorize?
+  response_type=code&
+  client_id={YOUR_CLIENT_ID}&
+  state={RANDOM_STRING}&
+  scope={SCOPE}&
+  redirect_uri=https://example-app.com/redirect&
+  code_challenge={YOUR_CODE_CHALLENGE}&
+  code_challenge_method=S256
+" {{ app.session.flashbag.has('loginURL') ? 'readonly' }}>{{ app.session.get('authorizationURL') ?: '' }}</textarea>
+                <div id="authorizationURLHelp" class="form-text">Create the initial URL for the authorization request and paste it above. Once it's correct, a "Log In" button with that URL will appear below</div>
+              </div>
+              {% if app.session.flashbag.has('loginURL') %}
+                <a href="{{ app.session.flashbag.get('loginURL')[0] }}" class="btn btn-primary" target="_blank">Log In</a>
+                <a href="?reset=1" class="btn">Reset</a>
+              {% else %}
+                <button type="submit" class="btn btn-primary">Check Your URL</button>
+              {% endif %}
+            </form>
+
+          </div>
         </div>
-      </div>
 
-      <h2>Token Response</h2>
-      <div class="card bg-light mb-3 mt-3 {{ app.session.get('complete_introduction') ? '' : 'disabled' }}">
-        <div class="card-body">
+        {% if app.session.get('authorizationURLSuccess') %}
 
-          <form method="post" action="{{ path(base_route ~ '/save') }}">
-            <div class="mb-3">
-              <textarea class="form-control" name="tokenResponse" aria-describedby="tokenHelp" rows="8" placeholder="{&#13;  &quot;token_type&quot;: &quot;Bearer&quot;,&#13;  ...&#13;}"></textarea>
-              <div id="tokenHelp" class="form-text">Use the authorization code flow to get an ID token, then paste the entire token response JSON here to check your work</div>
-            </div>
-            <button type="submit" class="btn btn-primary">Check Your Response</button>
-          </form>
+          <p>Now you’ll need to make a POST request to the token endpoint to get an access token and ID token. Replace the placeholder values with your own.</p>
 
+          <textarea class="form-control code" rows="8">curl -X POST {{ app.session.get('token_endpoint') ?? 'https://xxxxxx.us.auth0.com/oauth/token' }} \
+  -d grant_type=authorization_code \
+  -d redirect_uri=https://example-app.com/redirect \
+  -d client_id={YOUR_CLIENT_ID} \ {{ confidential_client ? "\n  -d client_secret={YOUR_CLIENT_SECRET} \\" : "" }}
+  -d code_verifier={YOUR_CODE_VERIFIER} \
+  -d code={YOUR_AUTHORIZATION_CODE}</textarea>
+
+        <p>Paste the entire response (not just the access token) below to check your work.</p>
+
+        {% endif %}
+
+        <h2>Token Response</h2>
+        <div class="card bg-light mb-3 mt-3 {{ app.session.get('complete_introduction') ? '' : 'disabled' }}">
+          <div class="card-body">
+
+            <form method="post" action="{{ path(base_route ~ '/save') }}">
+              <div class="mb-3">
+                <textarea class="form-control" name="tokenResponse" aria-describedby="tokenHelp" rows="8" placeholder="{&#13;  &quot;token_type&quot;: &quot;Bearer&quot;,&#13;  ...&#13;}"></textarea>
+                <div id="tokenHelp" class="form-text">Use the authorization code flow to get an ID token, then paste the entire token response JSON here to check your work</div>
+              </div>
+              <button type="submit" class="btn btn-primary">Check Your Response</button>
+            </form>
+
+          </div>
         </div>
-      </div>
 
       {% endif %}
 
