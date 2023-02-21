@@ -218,7 +218,15 @@ trait AuthorizationFlowTrait {
 
     $this->tokenString = $tokenString = $response['access_token'];
 
-    if(!preg_match('/^(.+)\.(.+)\.(.+)$/', $tokenString, $match)) {
+    // Check if the access token looks like an Auth0 token without a custom audience
+    if(preg_match('/^([^\.]+)\.\.([^\.]+)\.([^\.]+)\.([^\.]+)$/', $tokenString)) {
+      return $this->_respondWithError($this->baseRoute,
+        'The access token returned looks like an Opaque Auth0 access token, which means you probably didn\'t set the default audience on your account as described in the getting started exercise.',
+        $tokenString);
+    }
+
+
+    if(!preg_match('/^([^\.]+)\.([^\.]+)\.([^\.]+)$/', $tokenString, $match)) {
       return $this->_respondWithError($this->baseRoute,
         'The access token returned does not look like a JWT. This tool will only with with JWT access tokens.',
         $tokenString);
