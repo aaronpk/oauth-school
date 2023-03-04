@@ -7,6 +7,7 @@ use GuzzleHttp;
 use \Firebase\JWT\JWT;
 use \Firebase\JWT\JWK;
 use ORM;
+use Base64Url\Base64Url;
 
 trait AuthorizationFlowTrait {
 
@@ -232,8 +233,8 @@ trait AuthorizationFlowTrait {
         $tokenString);
     }
 
-    $this->header = $header = json_decode(base64_decode($match[1]), true);
-    $this->claims = $claims = json_decode(base64_decode($match[2]), true);
+    $this->header = $header = json_decode(Base64Url::decode($match[1]), true);
+    $this->claims = $claims = json_decode(Base64Url::decode($match[2]), true);
 
     if(!$claims || !is_array($claims)) {
       return $this->_respondWithError($this->baseRoute,

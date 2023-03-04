@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use GuzzleHttp;
 use ORM;
+use Base64Url\Base64Url;
 
 class AdminController extends AbstractController {
 
@@ -31,7 +32,7 @@ class AdminController extends AbstractController {
     $this->session->set('state', bin2hex(random_bytes(10)));
 
     $this->session->set('code_verifier', $code_verifier = bin2hex(random_bytes(50)));
-    $code_challenge = rtrim(strtr(base64_encode((hash('sha256', $code_verifier, true))), '+/', '-_'), '=');
+    $code_challenge = Base64Url::encode(hash('sha256', $code_verifier, true));
 
     $params = [
       'response_type' => 'code',
@@ -84,7 +85,7 @@ class AdminController extends AbstractController {
       }
 
       $claims_component = explode('.', $info['id_token'])[1];
-      $userinfo = json_decode(base64_decode($claims_component), true);
+      $userinfo = json_decode(Base64Url::decode($claims_component), true);
 
       $this->session->set('admin_user_id', $userinfo['sub']);
       $this->session->set('admin_user_name', $userinfo['name']);
