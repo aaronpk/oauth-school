@@ -33,4 +33,4 @@ services:
 
     Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler:
       arguments:
-        - '%env(CLEARDB_DATABASE_URL)%'
+        - '%env(DATABASE_URL)%'
